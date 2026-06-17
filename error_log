@@ -1,0 +1,42 @@
+[13-Jun-2026 15:37:28 UTC] PHP Fatal error:  Uncaught UnexpectedValueException: There is no existing directory at "/home/p6evwboinlw0/public_html/MILLENIUMNEWSROOM/storage/logs" and it could not be created: Permission denied in /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/StreamHandler.php:253
+Stack trace:
+#0 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/StreamHandler.php(149): Monolog\Handler\StreamHandler->createDir()
+#1 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/AbstractProcessingHandler.php(44): Monolog\Handler\StreamHandler->write()
+#2 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Logger.php(391): Monolog\Handler\AbstractProcessingHandler->handle()
+#3 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Logger.php(646): Monolog\Logger->addRecord()
+#4 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Log/Logger.php(187): Monolog\Logger->error()
+#5 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Log/Logger.php(96): Illuminate\Log\Logger->writeLog()
+#6 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\Log\Logger->error()
+#7 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(402): Illuminate\Log\LogManager->error()
+#8 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(365): Illuminate\Foundation\Exceptions\Handler->reportThrowable()
+#9 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(933): Illuminate\Foundation\Exceptions\Handler->report()
+#10 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(847): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#11 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(738): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#12 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(626): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#13 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#14 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#15 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#16 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#17 {main}
+  thrown in /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/StreamHandler.php on line 253
+[13-Jun-2026 15:42:38 UTC] PHP Fatal error:  Uncaught UnexpectedValueException: There is no existing directory at "/home/p6evwboinlw0/public_html/MILLENIUMNEWSROOM/storage/logs" and it could not be created: Permission denied in /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/StreamHandler.php:253
+Stack trace:
+#0 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/StreamHandler.php(149): Monolog\Handler\StreamHandler->createDir()
+#1 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/AbstractProcessingHandler.php(44): Monolog\Handler\StreamHandler->write()
+#2 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Logger.php(391): Monolog\Handler\AbstractProcessingHandler->handle()
+#3 /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Logger.php(646): Monolog\Logger->addRecord()
+#4 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Log/Logger.php(187): Monolog\Logger->error()
+#5 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Log/Logger.php(96): Illuminate\Log\Logger->writeLog()
+#6 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\Log\Logger->error()
+#7 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(402): Illuminate\Log\LogManager->error()
+#8 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(365): Illuminate\Foundation\Exceptions\Handler->reportThrowable()
+#9 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(933): Illuminate\Foundation\Exceptions\Handler->report()
+#10 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(847): Illuminate\Foundation\Exceptions\Handler->renderHttpException()
+#11 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(738): Illuminate\Foundation\Exceptions\Handler->prepareResponse()
+#12 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(626): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse()
+#13 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate\Foundation\Exceptions\Handler->render()
+#14 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#15 /home/i849nny8gj3m/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#16 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#17 {main}
+  thrown in /home/i849nny8gj3m/public_html/vendor/monolog/monolog/src/Monolog/Handler/StreamHandler.php on line 253

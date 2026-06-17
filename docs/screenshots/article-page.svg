@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760">
+  <rect width="1280" height="760" fill="#f7f1e7"/>
+  <rect x="92" y="70" width="720" height="600" rx="10" fill="#fff" stroke="#dec88e"/>
+  <rect x="850" y="70" width="320" height="600" rx="10" fill="#fff8e7" stroke="#dec88e"/>
+  <text x="132" y="150" fill="#9d7318" font-family="Arial" font-size="18" font-weight="700">TECHNOLOGY</text>
+  <text x="132" y="230" fill="#1f1a12" font-family="Georgia" font-size="54" font-weight="700">Modern Article Reading Experience</text>
+  <rect x="132" y="280" width="620" height="210" rx="8" fill="#1f1a12"/>
+  <text x="132" y="540" fill="#4b3a1c" font-family="Arial" font-size="22">Author card, sticky share, gallery, related stories and comments UI.</text>
+  <text x="890" y="138" fill="#1f1a12" font-family="Georgia" font-size="34">Trending</text>
+  <g fill="#c79a2b"><circle cx="908" cy="198" r="16"/><circle cx="908" cy="258" r="16"/><circle cx="908" cy="318" r="16"/></g>
+</svg>

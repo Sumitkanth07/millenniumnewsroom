@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760">
+  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#15100a"/><stop offset="1" stop-color="#7a5a1c"/></linearGradient></defs>
+  <rect width="1280" height="760" fill="#f7f1e7"/>
+  <rect width="1280" height="94" fill="#15100a"/>
+  <text x="64" y="58" fill="#d8b45c" font-family="Georgia" font-size="34" font-weight="700">MILLENNIUMNEWSROOM</text>
+  <rect x="0" y="94" width="1280" height="330" fill="url(#g)"/>
+  <text x="76" y="228" fill="#f7f1e7" font-family="Georgia" font-size="62" font-weight="700">Premium News Hero Slider</text>
+  <text x="80" y="284" fill="#f0dfb9" font-family="Arial" font-size="24">Featured stories, breaking news, market strip and immersive editorial layout.</text>
+  <rect x="80" y="470" width="480" height="210" rx="10" fill="#fff" stroke="#dec88e"/>
+  <rect x="590" y="470" width="280" height="210" rx="10" fill="#fff" stroke="#dec88e"/>
+  <rect x="900" y="470" width="300" height="210" rx="10" fill="#1f1a12"/>
+  <text x="110" y="535" fill="#1f1a12" font-family="Georgia" font-size="34">Headline Mosaic</text>
+  <text x="620" y="535" fill="#1f1a12" font-family="Georgia" font-size="30">Latest Feed</text>
+  <text x="930" y="535" fill="#d8b45c" font-family="Georgia" font-size="30">Most Read</text>
+</svg>
