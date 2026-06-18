@@ -98,8 +98,8 @@ class SeoManagerController extends Controller
                     $url = route('category.show', $model->slug);
                 } elseif ($type === 'Page') {
                     $url = route('page.show', $model->slug);
-                } elseif ($type === 'Tag') {
-                    $url = url('/search?q=' . urlencode($model->name));
+                } elseif ($type === 'Author') {
+                    $url = route('author.show', $model->slug);
                 } else {
                     $url = url('/' . $model->slug);
                 }
@@ -252,33 +252,20 @@ class SeoManagerController extends Controller
             ];
         }
 
-        // 5. Tags
-        foreach (Tag::orderBy('name')->get() as $tag) {
-            $path = '/search?q=' . urlencode($tag->name);
-            $inventory[] = [
-                'title' => '#' . $tag->name,
-                'path' => $path,
-                'url' => url($path),
-                'type' => 'Tag',
-                'id' => $tag->id,
-                'seo' => $tag->seoSetting
-            ];
-        }
-
-        // 6. Authors
+        // 5. Authors
         foreach (Author::orderBy('name')->get() as $author) {
-            $path = '/search?category=&sort=latest&q=' . urlencode($author->name);
+            $path = '/author/' . $author->slug;
             $inventory[] = [
                 'title' => $author->name . ' (Author Profile)',
                 'path' => $path,
-                'url' => url($path),
+                'url' => route('author.show', $author->slug),
                 'type' => 'Author',
                 'id' => $author->id,
                 'seo' => $author->seoSetting
             ];
         }
 
-        // 7. Savings Calculator
+        // 6. Savings Calculator
         $inventory[] = [
             'title' => 'Savings Calculator Tool',
             'path' => '/savings-calculator',
@@ -286,16 +273,6 @@ class SeoManagerController extends Controller
             'type' => 'Custom',
             'id' => 0,
             'seo' => SeoSetting::where('seoable_type', 'Path:/savings-calculator')->where('seoable_id', 0)->first()
-        ];
-
-        // 8. Search
-        $inventory[] = [
-            'title' => 'Search News',
-            'path' => '/search',
-            'url' => route('search'),
-            'type' => 'Custom',
-            'id' => 0,
-            'seo' => SeoSetting::where('seoable_type', 'Path:/search')->where('seoable_id', 0)->first()
         ];
 
         return $inventory;
@@ -448,7 +425,6 @@ class SeoManagerController extends Controller
         $urls[] = $appUrl . '/';
         $urls[] = $appUrl . '/blog';
         $urls[] = $appUrl . '/savings-calculator';
-        $urls[] = $appUrl . '/search';
 
         foreach (Page::where('is_published', true)->get(['slug']) as $page) {
             $urls[] = $appUrl . '/page/' . $page->slug;
