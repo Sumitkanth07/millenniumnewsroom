@@ -1,8 +1,8 @@
 .site-footer {
     display: grid;
-    grid-template-columns: 1.2fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
     justify-content: stretch;
-    gap: 28px;
+    gap: 32px;
     padding: 42px 7vw;
     background: linear-gradient(135deg, #102218, #183226);
 }
@@ -32,7 +32,13 @@
     color: #b9cfc0;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1024px) {
+    .site-footer {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
     .site-footer {
         grid-template-columns: 1fr;
         padding: 34px 22px;

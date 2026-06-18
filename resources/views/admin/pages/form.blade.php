@@ -35,7 +35,7 @@
     </label>
 
     <label>Content
-        <textarea id="content" name="content" rows="14" required>{{ old('content', $page->content) }}</textarea>
+        <textarea id="content" name="content" rows="14">{{ old('content', $page->content) }}</textarea>
     </label>
 
     <label>SEO title
