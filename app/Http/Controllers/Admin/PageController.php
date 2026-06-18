@@ -69,7 +69,7 @@ class PageController extends Controller
         return $request->validate([
             'title' => ['required', 'string', 'max:180'],
             'slug' => ['nullable', 'string', 'max:200', 'unique:pages,slug'.($request->route('page') ? ','.$request->route('page')->id : '')],
-            'banner_image' => ['nullable', 'image', 'max:4096'],
+            'banner_image' => ['nullable', 'image', 'max:1024'],
             'content' => ['required', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
@@ -83,9 +83,9 @@ class PageController extends Controller
             mkdir($directory, 0775, true);
         }
 
-        $filename = time().'_'.uniqid().'_'.preg_replace('/[^A-Za-z0-9.\-_]/', '_', $file->getClientOriginalName());
-        $file->move($directory, $filename);
+        $baseName = time().'_'.uniqid().'_'.preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $optimized = \App\Helpers\ImageOptimizer::optimize($file, $directory, $baseName);
 
-        return 'uploads/pages/'.$filename;
+        return 'uploads/pages/'.$optimized['main'];
     }
 }

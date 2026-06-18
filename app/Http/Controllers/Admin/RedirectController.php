@@ -13,9 +13,16 @@ class RedirectController extends Controller
         return view('admin.redirects.index', ['redirects' => Redirect::latest()->get()]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.redirects.form', ['redirect' => new Redirect()]);
+        $redirect = new Redirect();
+        if ($request->has('source')) {
+            $redirect->source = $request->query('source');
+        }
+        if ($request->has('destination')) {
+            $redirect->destination = $request->query('destination');
+        }
+        return view('admin.redirects.form', ['redirect' => $redirect]);
     }
 
     public function store(Request $request)

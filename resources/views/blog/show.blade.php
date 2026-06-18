@@ -34,9 +34,12 @@
         <h1>{{ $blog->title }}</h1>
 
         <p class="muted">
-            By {{ $blog->author?->name ?? 'MILLENNIUM NEWSROOM Desk' }}
-            Â·
-            {{ optional($blog->published_at)->format('M d, Y h:i A') }}
+            By @if($blog->author)<a href="{{ route('author.show', $blog->author->slug) }}" style="color: #c79a2b; text-decoration: none; font-weight: bold;">{{ $blog->author->name }}</a>@else MILLENNIUM NEWSROOM Desk @endif
+            &middot;
+            Published: {{ optional($blog->published_at)->format('M d, Y h:i A') }}
+            @if($blog->updated_at && $blog->updated_at->gt($blog->published_at->addMinutes(5)))
+                &middot; Updated: {{ $blog->updated_at->format('M d, Y h:i A') }}
+            @endif
         </p>
 
         @if($blog->author)
@@ -50,7 +53,7 @@
                 @endif
 
                 <div>
-                    <strong>{{ $blog->author->name }}</strong>
+                    <strong><a href="{{ route('author.show', $blog->author->slug) }}" style="color: #c79a2b; text-decoration: none;">{{ $blog->author->name }}</a></strong>
                     <p>{{ $blog->author->bio }}</p>
                 </div>
 

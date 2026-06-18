@@ -156,6 +156,24 @@ class FrontendController extends Controller
         ]);
     }
 
+    public function author(\App\Models\Author $author)
+    {
+        abort_unless($author->is_active, 404);
+
+        $posts = $author->blogs()
+            ->with(['category', 'author'])
+            ->where('is_published', true)
+            ->latest('published_at')
+            ->paginate(12);
+
+        return view('frontend.author', [
+            'author' => $author,
+            'posts' => $posts,
+            'metaTitle' => $author->name . ' | Author Profile | MILLENNIUM NEWSROOM',
+            'metaDescription' => $author->bio ?: 'Read articles published by ' . $author->name . ' on MILLENNIUM NEWSROOM.',
+        ]);
+    }
+
     public function sitemap(): Response
     {
         $blogs = Blog::with('category')->where('is_published', true)->latest('updated_at')->get(['id', 'category_id', 'slug', 'updated_at']);
@@ -217,6 +235,11 @@ class FrontendController extends Controller
 
     public function llms(): Response
     {
+        $rules = Setting::getValue('llms_txt');
+        if ($rules) {
+            return response($rules, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+        }
+
         $latestPosts = Blog::with('category')
             ->where('is_published', true)
             ->latest('published_at')

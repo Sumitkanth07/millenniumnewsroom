@@ -28,7 +28,11 @@ class CategoryController extends Controller
         $data['slug'] = Str::slug($data['slug'] ?: $data['name']);
         $data['is_active'] = $request->boolean('is_active', true);
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('uploads/categories', 'public');
+            $file = $request->file('image');
+            $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $destination = public_path('uploads/categories');
+            $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+            $data['image'] = 'uploads/categories/' . $optimized['main'];
         } else {
             unset($data['image']);
         }
@@ -48,7 +52,11 @@ class CategoryController extends Controller
         $data['slug'] = Str::slug($data['slug'] ?: $data['name']);
         $data['is_active'] = $request->boolean('is_active');
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('uploads/categories', 'public');
+            $file = $request->file('image');
+            $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $destination = public_path('uploads/categories');
+            $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+            $data['image'] = 'uploads/categories/' . $optimized['main'];
         } else {
             unset($data['image']);
         }
@@ -70,7 +78,7 @@ class CategoryController extends Controller
             'name' => ['required', 'string', 'max:120'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'slug' => ['nullable', 'string', 'max:140'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'image', 'max:1024'],
             'description' => ['nullable', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],

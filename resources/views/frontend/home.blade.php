@@ -73,7 +73,7 @@
                         @endphp
                         <article class="mosaic-card @if($loop->first) large @endif">
                             @if($topImage)
-                                <img src="{{ asset($topImage) }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                                <img src="{{ $loop->first ? asset($topImage) : $post->getThumbnailUrl() }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
                             @endif
                             <div style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
                                 <span style="background: #c79a2b; color: #1f1a12; padding: 3px 8px; border-radius: 4px; font-size: 10px;">{{ $post->category?->name }}</span>
@@ -132,7 +132,7 @@
                     <article class="card" style="display: flex; flex-direction: column; height: 100%; padding: 0; overflow: hidden; background: rgba(255,255,255,0.9);">
                         @if($freshImage)
                             <a href="{{ $post->publicUrl() }}" style="display: block; height: 200px; overflow: hidden;">
-                                <img src="{{ asset($freshImage) }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                             </a>
                         @endif
                         <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
@@ -187,7 +187,7 @@
                                 <div style="display: flex; gap: 16px; align-items: flex-start;">
                                     @if($img)
                                         <a href="{{ $post->publicUrl() }}" style="flex: 0 0 90px;">
-                                            <img src="{{ asset($img) }}" alt="{{ $post->title }}" style="width: 90px; height: 70px; object-fit: cover; border-radius: 8px;">
+                                            <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" style="width: 90px; height: 70px; object-fit: cover; border-radius: 8px;" loading="lazy" decoding="async">
                                         </a>
                                     @endif
                                     <div>
@@ -221,7 +221,7 @@
                     <article class="fresh-card" style="display: flex; flex-direction: column;">
                         <a class="story-thumb @unless($freshImage) placeholder @endunless" href="{{ $post->publicUrl() }}" style="height: 220px;">
                             @if($freshImage)
-                                <img src="{{ asset($freshImage) }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
                             @else
                                 <span>{{ strtoupper(substr($post->category?->name ?? 'MN', 0, 2)) }}</span>
                             @endif

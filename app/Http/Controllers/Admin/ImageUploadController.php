@@ -12,24 +12,22 @@ class ImageUploadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => ['required', 'image', 'max:4096']
+            'file' => ['required', 'image', 'max:1024']
         ]);
 
         $file = $request->file('file');
-        $mimeType = $file->getMimeType();
-        $size = $file->getSize();
-
-        $filename = time().'_'.uniqid().'_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
-
+        $baseName = time().'_'.uniqid().'_'.\Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $destination = public_path('uploads/editor');
 
         if (! is_dir($destination)) {
             mkdir($destination, 0775, true);
         }
 
-        $file->move($destination, $filename);
+        $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+        $path = 'uploads/editor/' . $optimized['main'];
 
-        $path = 'uploads/editor/' . $filename;
+        $mimeType = 'image/webp';
+        $size = file_exists(public_path($path)) ? filesize(public_path($path)) : $file->getSize();
 
         MediaItem::create([
             'name' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),

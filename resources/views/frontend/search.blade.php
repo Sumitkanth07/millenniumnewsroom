@@ -31,7 +31,7 @@
         @forelse($posts as $post)
             @php($image = $post->featured_image ?: $post->image)
             <article class="list-card">
-                @if($image)<img src="{{ asset($image) }}" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy" decoding="async">@endif
+                @if($image)<img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy" decoding="async">@endif
                 <div><span>{{ $post->category?->name }}</span>   <h3><a href="{{ $post->publicUrl() }}">{{ $post->title }}</a></h3><p>{{ $post->excerpt }}</p></div>
             </article>
         @empty
@@ -42,4 +42,26 @@
         {{ $posts->links() }}
     </div>
 </section>
+
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    '@id' => url()->current() . '#breadcrumb',
+    'itemListElement' => [
+        [
+            '@type' => 'ListItem',
+            'position' => 1,
+            'name' => 'Home',
+            'item' => rtrim(config('app.url'), '/')
+        ],
+        [
+            '@type' => 'ListItem',
+            'position' => 2,
+            'name' => 'Search',
+            'item' => url()->current()
+        ]
+    ]
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
 @endsection

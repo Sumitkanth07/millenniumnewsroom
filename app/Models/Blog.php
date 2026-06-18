@@ -115,6 +115,38 @@ class Blog extends Model
         ]);
     }
 
+    public function getThumbnailUrl(): string
+    {
+        $image = $this->featured_image ?: $this->image;
+        if (!$image) {
+            return asset('images/default.jpg'); // or fallback placeholder
+        }
+
+        // If it's a URL, return it directly
+        if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+            return $image;
+        }
+
+        // If it starts with storage/ or uploads/
+        $cleanImage = ltrim($image, '/');
+        
+        // Check if there is a thumbnail version (inside thumbs/ subdirectory of the parent folder)
+        $pathInfo = pathinfo($cleanImage);
+        $thumbPath = ($pathInfo['dirname'] !== '.' ? $pathInfo['dirname'] . '/' : '') . 'thumbs/' . $pathInfo['filename'] . '.webp';
+        
+        if (file_exists(public_path($thumbPath))) {
+            return asset($thumbPath);
+        }
+        
+        // Fallback to WebP of main image if it exists
+        $webpPath = ($pathInfo['dirname'] !== '.' ? $pathInfo['dirname'] . '/' : '') . $pathInfo['filename'] . '.webp';
+        if (file_exists(public_path($webpPath))) {
+            return asset($webpPath);
+        }
+
+        return asset($cleanImage);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Generate Unique Slug

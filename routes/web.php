@@ -25,6 +25,7 @@ Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/category/{category:slug}', [FrontendController::class, 'category'])->name('category.show');
 Route::get('/sitemap', [FrontendController::class, 'htmlSitemap'])->name('sitemap.page');
 Route::get('/page/{page:slug}', [FrontendController::class, 'page'])->name('page.show');
+Route::get('/author/{author:slug}', [FrontendController::class, 'author'])->name('author.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{blog:slug}', [BlogController::class, 'redirectLegacy'])->name('blog.show');
 Route::get('/savings-calculator', [CalculatorController::class, 'show'])->name('calculator.show');
@@ -63,6 +64,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/footer', [FooterController::class, 'edit'])->name('footer.edit');
         Route::post('/footer/update', [FooterController::class, 'update'])->name('footer.update');
         Route::resource('navigation', NavigationController::class)->except(['show']);
+        
+        // SEO Manager
+        Route::get('/seo', [\App\Http\Controllers\Admin\SeoManagerController::class, 'index'])->name('seo.index');
+        Route::get('/seo/edit', [\App\Http\Controllers\Admin\SeoManagerController::class, 'edit'])->name('seo.edit');
+        Route::post('/seo/update', [\App\Http\Controllers\Admin\SeoManagerController::class, 'update'])->name('seo.update');
+        Route::post('/seo/update-robots', [\App\Http\Controllers\Admin\SeoManagerController::class, 'updateRobots'])->name('seo.update-robots');
+        Route::post('/seo/clear-cache', [\App\Http\Controllers\Admin\SeoManagerController::class, 'clearCache'])->name('seo.clear-cache');
+
         Route::resource('redirects', AdminRedirectController::class)->except(['show']);
         Route::post('/upload-image', [ImageUploadController::class, 'store'])->name('upload.image');
         Route::post('/uploads/images', [ImageUploadController::class, 'store'])->name('images.store');

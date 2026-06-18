@@ -103,9 +103,9 @@ class BlogController extends Controller
             'content' => ['required', 'string'],
             'category_id' => ['nullable', 'exists:categories,id'],
             'author_id' => ['nullable', 'exists:authors,id'],
-            'image' => ['nullable', 'image', 'max:4096'],
-            'featured_image' => ['nullable', 'image', 'max:4096'],
-            'gallery_images.*' => ['nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'image', 'max:1024'],
+            'featured_image' => ['nullable', 'image', 'max:1024'],
+            'gallery_images.*' => ['nullable', 'image', 'max:1024'],
             'remove_gallery_images.*' => ['nullable', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
@@ -136,21 +136,11 @@ class BlogController extends Controller
 
         // Create upload folders if missing
         if (!file_exists($uploadRoot . '/uploads')) {
-
-            mkdir(
-                $uploadRoot . '/uploads',
-                0775,
-                true
-            );
+            mkdir($uploadRoot . '/uploads', 0775, true);
         }
 
         if (!file_exists($uploadRoot . '/uploads/gallery')) {
-
-            mkdir(
-                $uploadRoot . '/uploads/gallery',
-                0775,
-                true
-            );
+            mkdir($uploadRoot . '/uploads/gallery', 0775, true);
         }
 
         /*
@@ -161,10 +151,10 @@ class BlogController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $file->getClientOriginalName());
+            $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
             $destination = $uploadRoot . '/uploads';
-            $file->move($destination, $filename);
-            $data['image'] = 'uploads/' . $filename;
+            $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+            $data['image'] = 'uploads/' . $optimized['main'];
         } else {
             unset($data['image']);
         }
@@ -178,10 +168,10 @@ class BlogController extends Controller
 
         if ($request->hasFile('featured_image')) {
             $file = $request->file('featured_image');
-            $filename = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $file->getClientOriginalName());
+            $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
             $destination = $uploadRoot . '/uploads';
-            $file->move($destination, $filename);
-            $data['featured_image'] = 'uploads/' . $filename;
+            $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+            $data['featured_image'] = 'uploads/' . $optimized['main'];
         } else {
             unset($data['featured_image']);
         }
@@ -207,27 +197,13 @@ class BlogController extends Controller
         }
 
         if ($request->hasFile('gallery_images')) {
-
             $galleryImages = $blog && empty($removeImages) ? ($blog->gallery_images ?: []) : $galleryImages;
 
             foreach ($request->file('gallery_images') as $file) {
-
-                $filename =
-                    time() . '_' .
-                    uniqid() . '_' .
-                    preg_replace(
-                        '/[^A-Za-z0-9\.\-_]/',
-                        '_',
-                        $file->getClientOriginalName()
-                    );
-
-                $destination =
-                    $uploadRoot . '/uploads/gallery';
-
-                $file->move($destination, $filename);
-
-                $galleryImages[] =
-                    'uploads/gallery/' . $filename;
+                $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+                $destination = $uploadRoot . '/uploads/gallery';
+                $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+                $galleryImages[] = 'uploads/gallery/' . $optimized['main'];
             }
             $data['gallery_images'] = $galleryImages;
         }

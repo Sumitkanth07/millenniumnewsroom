@@ -24,6 +24,7 @@
         <a href="{{ route('admin.navigation.index') }}">Navigation</a>
         <a href="{{ route('admin.footer.edit') }}">Footer Settings</a>
         <a href="{{ route('admin.redirects.index') }}">Redirects</a>
+        <a href="{{ route('admin.seo.index') }}">SEO Manager</a>
         <form method="POST" action="{{ route('admin.logout') }}">@csrf<button>Logout</button></form>
     </aside>
     <main class="admin-main">

@@ -17,14 +17,12 @@ class MediaLibraryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => ['required', 'image', 'max:4096'],
+            'file' => ['required', 'image', 'max:1024'],
             'folder' => ['nullable', 'string', 'max:80'],
             'alt_text' => ['nullable', 'string', 'max:255'],
         ]);
 
         $file = $request->file('file');
-        $mimeType = $file->getMimeType();
-        $size = $file->getSize();
         $folder = trim($request->input('folder', 'news'), '/') ?: 'news';
         $directory = public_path('uploads/media/'.$folder);
 
@@ -32,9 +30,12 @@ class MediaLibraryController extends Controller
             mkdir($directory, 0775, true);
         }
 
-        $filename = time().'_'.uniqid().'_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
-        $file->move($directory, $filename);
-        $path = 'uploads/media/'.$folder.'/'.$filename;
+        $baseName = time().'_'.uniqid().'_'.\Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $optimized = \App\Helpers\ImageOptimizer::optimize($file, $directory, $baseName);
+        $path = 'uploads/media/'.$folder.'/'.$optimized['main'];
+
+        $mimeType = 'image/webp';
+        $size = file_exists(public_path($path)) ? filesize(public_path($path)) : $file->getSize();
 
         MediaItem::create([
             'name' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),

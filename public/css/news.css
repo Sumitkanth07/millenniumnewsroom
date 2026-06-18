@@ -1451,7 +1451,47 @@ html[data-admin-theme=dark] nav[role="navigation"] span[aria-current="page"] {
     border-color: #c79a2b !important;
 }
 
+/* ===== ARTICLE TAGS AND BADGES VISIBILITY & CONTRAST FIX ===== */
+.tags span, .badge:not(.gold), .premium-badge, .section-kicker {
+    color: #5f4613 !important;
+    background-color: #f4ead1 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.badge.gold {
+    color: #1f1a12 !important;
+    background-color: #c79a2b !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
 
+html[data-theme=dark] .tags span, 
+html[data-theme=dark] .badge:not(.gold),
+html[data-theme=dark] .premium-badge,
+html[data-theme=dark] .section-kicker {
+    color: #f4d26b !important;
+    background-color: #1e1912 !important;
+    border: 1px solid #4a3718 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+html[data-theme=dark] .badge.gold {
+    color: #1f1a12 !important;
+    background-color: #c79a2b !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
 
+.tags span:hover, .badge:hover, .premium-badge:hover {
+    filter: brightness(0.95) !important;
+}
 
-
+/* ===== TINYMCE EDITOR THEME OVERRIDE PREVENTER ===== */
+.admin-main .tox span,
+.admin-main .tox button,
+.admin-main .tox label,
+.admin-main .tox a,
+.admin-main .tox-tbtn__select-label,
+.admin-main .tox-mbtn__select-label {
+    color: inherit !important;
+}

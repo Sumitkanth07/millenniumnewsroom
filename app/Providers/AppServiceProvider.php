@@ -74,6 +74,79 @@ class AppServiceProvider extends ServiceProvider
                 'ads' => $hasAds ? \App\Models\AdPlacement::where('is_active', true)->get()->keyBy('key') : collect(),
             ];
 
+            // Resolve SEO settings dynamically
+            $seo = null;
+            try {
+                if ($hasSettings && Schema::hasTable('seo_settings')) {
+                    $path = '/' . trim(request()->path(), '/');
+                    // Check path first
+                    $seo = \App\Models\SeoSetting::where('seoable_type', 'Path:' . $path)
+                        ->where('seoable_id', 0)
+                        ->first();
+
+                    // If not found, check bound parameters
+                    if (!$seo && request()->route()) {
+                        foreach (request()->route()->parameters() as $param) {
+                            if ($param instanceof \Illuminate\Database\Eloquent\Model && method_exists($param, 'seoSetting')) {
+                                $seo = $param->seoSetting;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                $seo = null;
+            }
+
+            if ($seo) {
+                if ($seo->meta_title) {
+                    $shared['metaTitle'] = $seo->meta_title;
+                }
+                if ($seo->meta_description) {
+                    $shared['metaDescription'] = $seo->meta_description;
+                }
+                if ($seo->robots_meta) {
+                    $shared['robotsMeta'] = $seo->robots_meta;
+                }
+                if ($seo->canonical_url) {
+                    $shared['canonicalUrl'] = $seo->canonical_url;
+                    $shared['canonical'] = $seo->canonical_url;
+                }
+                if ($seo->og_title) {
+                    $shared['ogTitle'] = $seo->og_title;
+                }
+                if ($seo->og_description) {
+                    $shared['ogDescription'] = $seo->og_description;
+                }
+
+                $shareImage = $seo->og_image;
+                if ($shareImage) {
+                    if (!str_starts_with($shareImage, 'http://') && !str_starts_with($shareImage, 'https://')) {
+                        $shareImage = rtrim((string) config('app.url'), '/').'/'.ltrim($shareImage, '/');
+                    }
+                    $shared['ogImage'] = $shareImage;
+                }
+
+                // Retrieve Twitter overrides from JSON data
+                if (is_array($seo->schema_data)) {
+                    if (!empty($seo->schema_data['twitter_title'])) {
+                        $shared['twitterTitle'] = $seo->schema_data['twitter_title'];
+                    }
+                    if (!empty($seo->schema_data['twitter_description'])) {
+                        $shared['twitterDescription'] = $seo->schema_data['twitter_description'];
+                    }
+                    if (!empty($seo->schema_data['twitter_image'])) {
+                        $twImg = $seo->schema_data['twitter_image'];
+                        if (!str_starts_with($twImg, 'http://') && !str_starts_with($twImg, 'https://')) {
+                            $twImg = rtrim((string) config('app.url'), '/').'/'.ltrim($twImg, '/');
+                        }
+                        $shared['twitterImage'] = $twImg;
+                    }
+                }
+
+                $shared['seoSchema'] = $seo;
+            }
+
             $view->with($shared);
         });
     }

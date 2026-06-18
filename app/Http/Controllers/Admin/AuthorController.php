@@ -25,7 +25,11 @@ class AuthorController extends Controller
         $data['slug'] = Str::slug($data['slug'] ?: $data['name']);
         $data['is_active'] = $request->boolean('is_active', true);
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('uploads/authors', 'public');
+            $file = $request->file('image');
+            $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $destination = public_path('uploads/authors');
+            $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+            $data['image'] = 'uploads/authors/' . $optimized['main'];
         } else {
             unset($data['image']);
         }
@@ -45,7 +49,11 @@ class AuthorController extends Controller
         $data['slug'] = Str::slug($data['slug'] ?: $data['name']);
         $data['is_active'] = $request->boolean('is_active');
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('uploads/authors', 'public');
+            $file = $request->file('image');
+            $baseName = time() . '_' . uniqid() . '_' . preg_replace('/[^A-Za-z0-9\-_]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+            $destination = public_path('uploads/authors');
+            $optimized = \App\Helpers\ImageOptimizer::optimize($file, $destination, $baseName);
+            $data['image'] = 'uploads/authors/' . $optimized['main'];
         } else {
             unset($data['image']);
         }
@@ -67,7 +75,7 @@ class AuthorController extends Controller
             'name' => ['required', 'string', 'max:120'],
             'slug' => ['nullable', 'string', 'max:140'],
             'email' => ['nullable', 'email', 'max:255'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'image', 'max:1024'],
             'bio' => ['nullable', 'string'],
         ]);
     }
