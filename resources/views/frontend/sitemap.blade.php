@@ -1,5 +1,5 @@
 {!! '<?xml version="1.0" encoding="UTF-8"?>' !!}
-@php($appUrl = rtrim(config('app.url'), '/'))
+@php($appUrl = str_replace('http://', 'https://', rtrim(config('app.url'), '/')))
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url><loc>{{ $appUrl }}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>
     <url><loc>{{ $appUrl }}/blog</loc><changefreq>hourly</changefreq><priority>0.8</priority></url>

@@ -212,7 +212,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             // Build Unified Schema Graph
-            $appUrl = rtrim((string) config('app.url'), '/');
+            $appUrl = str_replace('http://', 'https://', rtrim((string) config('app.url'), '/'));
             $logo = $shared['logo'];
             
             $schemaGraph = [
@@ -534,6 +534,30 @@ class AppServiceProvider extends ServiceProvider
                                 unset($decoded['@context']);
                             }
                             $schemaGraph[] = $decoded;
+                        }
+                    }
+                } elseif ($seo->schema_type === 'Organization' || $seo->schema_type === 'NewsMediaOrganization') {
+                    // Merge with the existing Organization node to prevent duplication
+                    if (isset($schemaGraph[0])) {
+                        $schemaGraph[0]['@type'] = ['Organization', 'NewsMediaOrganization'];
+                        if ($seo->meta_title) {
+                            $schemaGraph[0]['name'] = $seo->meta_title;
+                        }
+                        if ($seo->meta_description) {
+                            $schemaGraph[0]['description'] = $seo->meta_description;
+                        }
+                        if ($seo->canonical_url) {
+                            $schemaGraph[0]['url'] = $seo->canonical_url;
+                        }
+                    }
+                } elseif ($seo->schema_type === 'WebSite') {
+                    // Merge with the existing WebSite node to prevent duplication
+                    if (isset($schemaGraph[1])) {
+                        if ($seo->meta_title) {
+                            $schemaGraph[1]['name'] = $seo->meta_title;
+                        }
+                        if ($seo->canonical_url) {
+                            $schemaGraph[1]['url'] = $seo->canonical_url;
                         }
                     }
                 } else {
