@@ -12,27 +12,6 @@
     <meta property="og:image" content="{{ $article['image'] }}">
     <meta property="article:published_time" content="{{ $article['published_at'] }}">
     <meta property="article:modified_time" content="{{ $article['updated_at'] }}">
-    <meta name="twitter:card" content="summary_large_image">
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'NewsArticle',
-            'headline' => $article['headline'],
-            'description' => $article['seo_description'],
-            'image' => [$article['image']],
-            'datePublished' => $article['published_at'],
-            'dateModified' => $article['updated_at'],
-            'author' => [
-                '@type' => 'Person',
-                'name' => $article['author']['name'],
-            ],
-            'publisher' => [
-                '@type' => 'Organization',
-                'name' => 'MILLENNIUM NEWSROOM',
-            ],
-            'mainEntityOfPage' => $article['canonical'],
-        ], JSON_UNESCAPED_SLASHES) !!}
-    </script>
 @endpush
 
 @section('content')

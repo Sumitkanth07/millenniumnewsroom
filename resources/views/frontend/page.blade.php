@@ -11,26 +11,4 @@
     <h1>{{ $page->title }}</h1>
     <div class="content">{!! $page->content !!}</div>
 </article>
-
-<script type="application/ld+json">
-{!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'BreadcrumbList',
-    '@id' => url()->current() . '#breadcrumb',
-    'itemListElement' => [
-        [
-            '@type' => 'ListItem',
-            'position' => 1,
-            'name' => 'Home',
-            'item' => rtrim(config('app.url'), '/')
-        ],
-        [
-            '@type' => 'ListItem',
-            'position' => 2,
-            'name' => $page->title,
-            'item' => url()->current()
-        ]
-    ]
-], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-</script>
 @endsection

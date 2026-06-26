@@ -21,8 +21,17 @@
     <meta charset="utf-8">
     <meta name="google-site-verification" content="VxnnInXR42Safm3W-DIKiunWz4sQr5oGcW2SNJHdrMs" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="@yield('meta_description', 'Premium business news, markets, money and opinion coverage.')">
-    <title>@yield('title', 'MILLENNIUM NEWSROOM - Business News, Markets and Money')</title>
+    <title>@yield('title', $metaTitle ?? 'MILLENNIUM NEWSROOM - Business News, Markets and Money')</title>
+    <meta name="description" content="@yield('meta_description', $metaDescription ?? 'Premium business news, markets, money and opinion coverage.')">
+    <link rel="canonical" href="{{ $canonicalUrl ?? request()->url() }}">
+    <meta name="robots" content="{{ $robotsMeta ?? 'index,follow' }}">
+
+    @if(isset($schemaGraph))
+    <script type="application/ld+json">
+    {!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+    @endif
+
     @stack('head')
     <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ $assetVersion ?? time() }}">
     @stack('styles')

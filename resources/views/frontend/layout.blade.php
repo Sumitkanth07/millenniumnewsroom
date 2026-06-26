@@ -118,56 +118,10 @@
         }
     </style>
 
+    @if(isset($schemaGraph))
     <script type="application/ld+json">
-    {!! json_encode([
-        '@context' => 'https://schema.org',
-        '@graph' => [
-            [
-                '@type' => ['Organization', 'NewsMediaOrganization'],
-                '@id' => $appUrl.'#organization',
-                'name' => $siteName,
-                'url' => $appUrl,
-                'logo' => [
-                    '@type' => 'ImageObject',
-                    'url' => $logo ? $appUrl.'/'.ltrim($logo, '/') : $appUrl.'/favicon.ico'
-                ],
-                'description' => $tagline,
-                'publishingPrinciples' => $appUrl.'/page/editorial-policy',
-                'correctionsPolicy' => $appUrl.'/page/corrections-policy',
-                'ethicsPolicy' => $appUrl.'/page/editorial-policy',
-                'diversityPolicy' => $appUrl.'/page/fact-checking-policy',
-            ],
-            [
-                '@type' => 'WebSite',
-                '@id' => $appUrl.'#website',
-                'url' => $appUrl,
-                'name' => $siteName,
-                'publisher' => ['@id' => $appUrl.'#organization'],
-                'potentialAction' => [
-                    '@type' => 'SearchAction',
-                    'target' => $appUrl.'/search?q={search_term_string}',
-                    'query-input' => 'required name=search_term_string',
-                ],
-            ],
-        ],
-    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    {!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
-    @if(isset($seoSchema) && $seoSchema->schema_type && $seoSchema->schema_type !== 'None')
-        @if($seoSchema->schema_type === 'Custom' || $seoSchema->schema_type === 'Custom JSON-LD')
-            <script type="application/ld+json">
-            {!! is_array($seoSchema->schema_data) ? ($seoSchema->schema_data['custom_schema'] ?? json_encode($seoSchema->schema_data)) : $seoSchema->schema_data !!}
-            </script>
-        @else
-            <script type="application/ld+json">
-            {!! json_encode([
-                '@context' => 'https://schema.org',
-                '@type' => $seoSchema->schema_type,
-                'name' => $seoSchema->meta_title ?? $siteName,
-                'description' => $seoSchema->meta_description ?? $tagline,
-                'url' => $seoSchema->canonical_url ?? request()->url(),
-            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
-            </script>
-        @endif
     @endif
     @stack('head')
 </head>

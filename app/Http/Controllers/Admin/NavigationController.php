@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NavigationItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class NavigationController extends Controller
 {
@@ -21,6 +22,7 @@ class NavigationController extends Controller
     public function store(Request $request)
     {
         NavigationItem::create($this->validated($request) + ['is_active' => $request->boolean('is_active')]);
+        Cache::forget('navigation.items');
         return redirect()->route('admin.navigation.index')->with('status', 'Navigation item created.');
     }
 
@@ -32,12 +34,14 @@ class NavigationController extends Controller
     public function update(Request $request, NavigationItem $navigation)
     {
         $navigation->update($this->validated($request) + ['is_active' => $request->boolean('is_active')]);
+        Cache::forget('navigation.items');
         return redirect()->route('admin.navigation.index')->with('status', 'Navigation item updated.');
     }
 
     public function destroy(NavigationItem $navigation)
     {
         $navigation->delete();
+        Cache::forget('navigation.items');
         return back()->with('status', 'Navigation item deleted.');
     }
 
