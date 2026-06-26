@@ -118,9 +118,9 @@
         }
     </style>
 
-    @if(isset($schemaGraph))
+    @if(isset($seoSchemaData))
     <script type="application/ld+json">
-    {!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    {!! json_encode($seoSchemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
     @endif
     @stack('head')

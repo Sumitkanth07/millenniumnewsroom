@@ -26,9 +26,9 @@
     <link rel="canonical" href="{{ $canonicalUrl ?? request()->url() }}">
     <meta name="robots" content="{{ $robotsMeta ?? 'index,follow' }}">
 
-    @if(isset($schemaGraph))
+    @if(isset($seoSchemaData))
     <script type="application/ld+json">
-    {!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    {!! json_encode($seoSchemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
     @endif
 

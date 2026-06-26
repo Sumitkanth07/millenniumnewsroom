@@ -546,7 +546,10 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
-            $shared['schemaGraph'] = $schemaGraph;
+            $shared['seoSchemaData'] = [
+                '@context' => 'https://schema.org',
+                '@graph' => $schemaGraph,
+            ];
 
             $view->with($shared);
         });
