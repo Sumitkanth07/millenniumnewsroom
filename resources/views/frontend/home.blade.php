@@ -18,6 +18,11 @@
             @endphp
             <article class="hero-slide @if($loop->first) active @endif" data-article-url="{{ $post->publicUrl() }}">
                 @if($heroImage)
+                    @if($loop->first)
+                        @push('head')
+                            <link rel="preload" as="image" href="{{ asset($heroImage) }}">
+                        @endpush
+                    @endif
                     <img 
                         src="{{ asset($heroImage) }}"
                         alt="{{ $post->featured_image_alt ?: $post->title }}"
@@ -167,7 +172,7 @@
                         </div>
                         
                         @php
-                            $catPosts = App\Models\Blog::whereHas('category', function($q) use ($catName) {
+                            $catPosts = App\Models\Blog::with(['category', 'author'])->whereHas('category', function($q) use ($catName) {
                                 $q->where('name', $catName);
                             })->latest('published_at')->take(4)->get();
                         @endphp

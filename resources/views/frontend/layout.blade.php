@@ -108,7 +108,8 @@
 
     <link rel="stylesheet" href="{{ asset('css/news.css') }}?v={{ $assetVersion }}">
 
-    <link rel="stylesheet" href="{{ asset('css/footer.css') }}?v={{ $assetVersion }}">
+    <link rel="preload" href="{{ asset('css/footer.css') }}?v={{ $assetVersion }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('css/footer.css') }}?v={{ $assetVersion }}"></noscript>
 
     <style>
         :root{
@@ -126,7 +127,10 @@
                 '@id' => $appUrl.'#organization',
                 'name' => $siteName,
                 'url' => $appUrl,
-                'logo' => $logo ? $appUrl.'/'.ltrim($logo, '/') : $appUrl.'/favicon.ico',
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $logo ? $appUrl.'/'.ltrim($logo, '/') : $appUrl.'/favicon.ico'
+                ],
                 'description' => $tagline,
                 'publishingPrinciples' => $appUrl.'/page/editorial-policy',
                 'correctionsPolicy' => $appUrl.'/page/corrections-policy',

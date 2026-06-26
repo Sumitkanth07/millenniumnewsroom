@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 
 class Author extends Model
 {
+    public function seoSetting(): MorphOne
+    {
+        return $this->morphOne(SeoSetting::class, 'seoable');
+    }
     protected $fillable = ['name', 'slug', 'email', 'image', 'bio', 'designation', 'social_links', 'is_active'];
 
     protected function casts(): array

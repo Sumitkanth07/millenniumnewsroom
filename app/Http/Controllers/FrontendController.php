@@ -115,6 +115,7 @@ class FrontendController extends Controller
 
     public function category(Category $category)
     {
+        $category->load('seoSetting');
         $posts = $category->blogs()->with(['category', 'author'])->where('is_published', true)->latest('published_at')->paginate(12);
 
         return view('frontend.category', [
@@ -148,6 +149,7 @@ class FrontendController extends Controller
     public function page(Page $page)
     {
         abort_unless($page->is_published, 404);
+        $page->load('seoSetting');
 
         return view('frontend.page', [
             'page' => $page,
@@ -159,6 +161,7 @@ class FrontendController extends Controller
     public function author(\App\Models\Author $author)
     {
         abort_unless($author->is_active, 404);
+        $author->load('seoSetting');
 
         $posts = $author->blogs()
             ->with(['category', 'author'])

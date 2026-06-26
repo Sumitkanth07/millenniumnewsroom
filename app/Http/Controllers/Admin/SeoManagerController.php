@@ -174,6 +174,27 @@ class SeoManagerController extends Controller
 
         $seo->update($data);
 
+        // Sync with parent model for single source of truth
+        if ($type !== 'Custom' && $type !== 'Homepage') {
+            $modelClass = 'App\\Models\\' . $type;
+            if (class_exists($modelClass)) {
+                $model = $modelClass::find($id);
+                if ($model) {
+                    $updateData = [];
+                    $table = $model->getTable();
+                    $columns = \Illuminate\Support\Facades\Schema::getColumnListing($table);
+                    foreach (['meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'robots_meta'] as $col) {
+                        if (in_array($col, $columns)) {
+                            $updateData[$col] = $request->input($col);
+                        }
+                    }
+                    if (!empty($updateData)) {
+                        $model->update($updateData);
+                    }
+                }
+            }
+        }
+
         // Clear payload caches
         Cache::forget('frontend.home.payload');
 
@@ -196,9 +217,9 @@ class SeoManagerController extends Controller
     public function clearCache()
     {
         Cache::forget('frontend.home.payload');
+        Cache::forget('sitemap_data');
         return back()->with('status', 'Sitemap and homepage caches successfully cleared.');
     }
-
     private function getInventory(): array
     {
         $inventory = [];
@@ -210,11 +231,12 @@ class SeoManagerController extends Controller
             'url' => url('/'),
             'type' => 'Homepage',
             'id' => 0,
-            'seo' => SeoSetting::where('seoable_type', 'Path:/')->where('seoable_id', 0)->first()
+            'seo' => SeoSetting::where('seoable_type', 'Path:/')->where('seoable_id', 0)->first(),
+            'model' => null
         ];
 
         // 2. Static Pages
-        foreach (Page::orderBy('title')->get() as $page) {
+        foreach (Page::with('seoSetting')->orderBy('title')->get() as $page) {
             $path = '/page/' . $page->slug;
             $inventory[] = [
                 'title' => $page->title,
@@ -222,12 +244,13 @@ class SeoManagerController extends Controller
                 'url' => route('page.show', $page->slug),
                 'type' => 'Page',
                 'id' => $page->id,
-                'seo' => $page->seoSetting
+                'seo' => $page->seoSetting,
+                'model' => $page
             ];
         }
 
         // 3. Categories
-        foreach (Category::orderBy('name')->get() as $category) {
+        foreach (Category::with('seoSetting')->orderBy('name')->get() as $category) {
             $path = '/category/' . $category->slug;
             $inventory[] = [
                 'title' => $category->name,
@@ -235,12 +258,13 @@ class SeoManagerController extends Controller
                 'url' => route('category.show', $category->slug),
                 'type' => 'Category',
                 'id' => $category->id,
-                'seo' => $category->seoSetting
+                'seo' => $category->seoSetting,
+                'model' => $category
             ];
         }
 
         // 4. Posts
-        foreach (Blog::with('category')->latest('published_at')->get() as $blog) {
+        foreach (Blog::with(['category', 'seoSetting'])->latest('published_at')->get() as $blog) {
             $path = '/' . ($blog->category?->slug ?: 'news') . '/' . $blog->slug;
             $inventory[] = [
                 'title' => $blog->title,
@@ -248,12 +272,13 @@ class SeoManagerController extends Controller
                 'url' => $blog->publicUrl(),
                 'type' => 'Blog',
                 'id' => $blog->id,
-                'seo' => $blog->seoSetting
+                'seo' => $blog->seoSetting,
+                'model' => $blog
             ];
         }
 
         // 5. Authors
-        foreach (Author::orderBy('name')->get() as $author) {
+        foreach (Author::with('seoSetting')->orderBy('name')->get() as $author) {
             $path = '/author/' . $author->slug;
             $inventory[] = [
                 'title' => $author->name . ' (Author Profile)',
@@ -261,7 +286,8 @@ class SeoManagerController extends Controller
                 'url' => route('author.show', $author->slug),
                 'type' => 'Author',
                 'id' => $author->id,
-                'seo' => $author->seoSetting
+                'seo' => $author->seoSetting,
+                'model' => $author
             ];
         }
 
@@ -272,7 +298,8 @@ class SeoManagerController extends Controller
             'url' => route('calculator.show'),
             'type' => 'Custom',
             'id' => 0,
-            'seo' => SeoSetting::where('seoable_type', 'Path:/savings-calculator')->where('seoable_id', 0)->first()
+            'seo' => SeoSetting::where('seoable_type', 'Path:/savings-calculator')->where('seoable_id', 0)->first(),
+            'model' => null
         ];
 
         return $inventory;
@@ -287,11 +314,12 @@ class SeoManagerController extends Controller
 
         foreach ($inventory as $item) {
             $seo = $item['seo'];
-            $metaTitle = $seo?->meta_title ?: ($item['type'] === 'Blog' ? Blog::find($item['id'])->meta_title : ($item['type'] === 'Page' ? Page::find($item['id'])->meta_title : ($item['type'] === 'Category' ? Category::find($item['id'])->meta_title : null)));
-            $metaDescription = $seo?->meta_description ?: ($item['type'] === 'Blog' ? Blog::find($item['id'])->meta_description : ($item['type'] === 'Page' ? Page::find($item['id'])->meta_description : ($item['type'] === 'Category' ? Category::find($item['id'])->meta_description : null)));
+            $model = $item['model'];
+            $metaTitle = $seo?->meta_title ?: ($model?->meta_title ?? null);
+            $metaDescription = $seo?->meta_description ?: ($model?->meta_description ?? null);
             $canonicalUrl = $seo?->canonical_url;
             $schemaType = $seo?->schema_type;
-            $ogImage = $seo?->og_image ?: ($item['type'] === 'Blog' ? (Blog::find($item['id'])->featured_image ?: Blog::find($item['id'])->image) : null);
+            $ogImage = $seo?->og_image ?: ($item['type'] === 'Blog' && $model ? ($model->featured_image ?: $model->image) : null);
 
             $itemIssues = [];
             $totalChecks += 5;
@@ -313,11 +341,10 @@ class SeoManagerController extends Controller
             }
 
             // Check missing Alt tag for blogs
-            if ($item['type'] === 'Blog') {
-                $blog = Blog::find($item['id']);
-                if ($blog && ($blog->featured_image || $blog->image)) {
+            if ($item['type'] === 'Blog' && $model) {
+                if ($model->featured_image || $model->image) {
                     $totalChecks += 1;
-                    if (empty($blog->featured_image_alt)) {
+                    if (empty($model->featured_image_alt)) {
                         $itemIssues[] = 'Missing Image Alt Tag';
                     }
                 }
@@ -434,7 +461,7 @@ class SeoManagerController extends Controller
             $urls[] = $appUrl . '/category/' . $category->slug;
         }
 
-        foreach (Blog::where('is_published', true)->latest('published_at')->get() as $blog) {
+        foreach (Blog::with('category')->where('is_published', true)->latest('published_at')->get() as $blog) {
             $urls[] = $appUrl . '/' . ($blog->category?->slug ?: 'news') . '/' . $blog->slug;
         }
 

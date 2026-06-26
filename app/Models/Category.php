@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 
 class Category extends Model
 {
+    public function seoSetting(): MorphOne
+    {
+        return $this->morphOne(SeoSetting::class, 'seoable');
+    }
     protected $fillable = ['parent_id', 'name', 'slug', 'image', 'description', 'meta_title', 'meta_description', 'sort_order', 'order', 'is_active'];
 
     protected function casts(): array
