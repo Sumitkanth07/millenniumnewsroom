@@ -85,9 +85,11 @@
     <div class="container footer-bottom">
         <span>&copy; {{ now()->year }} MILLENNIUM NEWSROOM News Network. All rights reserved.</span>
         <nav class="footer-policy" aria-label="Legal links">
-            @foreach ($policyLinks as $link)
-                <a href="#">{{ $link }}</a>
-            @endforeach
+            <a href="{{ route('page.show', 'privacy-policy') }}">Privacy Policy</a>
+            <a href="{{ route('page.show', 'terms') }}">Terms</a>
+            <a href="{{ route('sitemap.page') }}">Sitemap</a>
+            <a href="{{ route('page.show', 'cookie-policy') }}">Cookie Policy</a>
+            <a href="javascript:void(0)" onclick="openCookieConsentSettings()" style="cursor: pointer;">Cookie Preferences</a>
         </nav>
     </div>
 </footer>
