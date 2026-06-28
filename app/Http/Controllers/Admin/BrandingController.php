@@ -29,7 +29,7 @@ class BrandingController extends Controller
 
             'meta_description' => ['nullable', 'string'],
 
-            'logo' => ['nullable', 'image', 'max:2048'],
+            'logo' => ['nullable', 'mimes:png,jpg,jpeg,webp,svg', 'max:2048'],
 
         ]);
 
@@ -42,22 +42,18 @@ class BrandingController extends Controller
             $filename =
                 time().'.'.$file->getClientOriginalExtension();
 
-            $destination =
-                (! empty($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : public_path()).'/uploads';
+            $publicDestination = public_path('uploads');
+            $baseDestination = base_path('uploads');
 
-            if (!file_exists($destination)) {
-
-                mkdir(
-                    $destination,
-                    0775,
-                    true
-                );
+            if (!file_exists($publicDestination)) {
+                mkdir($publicDestination, 0775, true);
+            }
+            if (!file_exists($baseDestination)) {
+                mkdir($baseDestination, 0775, true);
             }
 
-            $file->move(
-                $destination,
-                $filename
-            );
+            copy($file->getPathname(), $baseDestination.'/'.$filename);
+            $file->move($publicDestination, $filename);
 
             $data['logo'] =
                 'uploads/'.$filename;

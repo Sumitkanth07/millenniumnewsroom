@@ -58,12 +58,24 @@
             $shareImage = $appUrl.'/'.ltrim($shareImage, '/');
         }
         $canonical = $canonicalUrl ?? $appUrl.'/'.ltrim(request()->path(), '/');
+        
+        $logoExt = $logo ? pathinfo($logo, PATHINFO_EXTENSION) : null;
+        $logoMime = 'image/png';
+        if ($logoExt === 'jpg' || $logoExt === 'jpeg') {
+            $logoMime = 'image/jpeg';
+        } elseif ($logoExt === 'webp') {
+            $logoMime = 'image/webp';
+        } elseif ($logoExt === 'svg') {
+            $logoMime = 'image/svg+xml';
+        } elseif ($logoExt === 'ico') {
+            $logoMime = 'image/x-icon';
+        }
     @endphp
 
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="{{ $logo ? asset($logo) : asset('favicon.ico') }}">
+    <link rel="icon" type="{{ $logo ? $logoMime : 'image/x-icon' }}" href="{{ $logo ? asset($logo) : asset('favicon.ico') }}">
 
     <title>{{ $metaTitle ?? $siteTitle }}</title>
 
