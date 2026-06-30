@@ -13,11 +13,32 @@ use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Blog::with(['category', 'author']);
+
+        $sort = $request->query('sort');
+        if ($sort === 'views_asc') {
+            $query->orderBy('views_count', 'asc');
+        } elseif ($sort === 'views_desc') {
+            $query->orderBy('views_count', 'desc');
+        } else {
+            $query->latest();
+        }
+
         return view('admin.blogs.index', [
-            'blogs' => Blog::with(['category', 'author'])->latest()->paginate(12),
+            'blogs' => $query->paginate(12)->withQueryString(),
+            'currentSort' => $sort,
         ]);
+    }
+
+    public function resetViews(Blog $blog)
+    {
+        $blog->newQuery()->where('id', $blog->id)->update(['views_count' => 0]);
+        $blog->viewsLog()->delete();
+        Cache::forget('admin.dashboard.payload');
+
+        return back()->with('status', 'View count reset successfully.');
     }
 
     public function create()

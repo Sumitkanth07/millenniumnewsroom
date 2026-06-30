@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             CheckRedirects::class,
             SecurityHeaders::class,
+            \App\Http\Middleware\TrackViews::class,
         ]);
 
         $middleware->alias([

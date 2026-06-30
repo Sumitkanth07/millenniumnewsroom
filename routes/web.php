@@ -20,6 +20,14 @@ use App\Http\Controllers\CalculatorController;
 use App\Http\Controllers\FrontendController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/google1104d3cf9cd3b0b9.html', function () {
+    $path = public_path('google1104d3cf9cd3b0b9.html');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'text/html']);
+});
+
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/category/{category:slug}', [FrontendController::class, 'category'])->name('category.show');
@@ -50,6 +58,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('homepage', HomepageSectionController::class)->except(['show']);
+        Route::post('blogs/{blog}/reset-views', [AdminBlogController::class, 'resetViews'])->name('blogs.reset-views');
         Route::resource('blogs', AdminBlogController::class)->except(['show']);
         Route::resource('categories', CategoryController::class)->except(['show']);
         Route::resource('authors', AuthorController::class)->except(['show']);

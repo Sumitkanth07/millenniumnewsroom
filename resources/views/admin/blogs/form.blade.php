@@ -17,6 +17,23 @@
     </section>
 
     <aside class="panel form">
+        @if($blog->exists)
+            <div style="background: var(--surface-soft, rgba(0,0,0,0.02)); padding: 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--line, #ebedf2); font-size: 13px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600; text-transform: uppercase; color: var(--secondaryColor, #c79a2b);">Post Analytics</h4>
+                <div style="display: grid; gap: 6px; line-height: 1.5;">
+                    <div><strong>Total Views:</strong> {{ number_format($blog->views_count) }}</div>
+                    <div><strong>Publish Date:</strong> {{ $blog->published_at ? $blog->published_at->format('d M Y, H:i') : 'Not published' }}</div>
+                    <div><strong>Last Updated:</strong> {{ $blog->updated_at ? $blog->updated_at->format('d M Y, H:i') : 'Never' }}</div>
+                    @if($blog->comments()->exists())
+                        <div><strong>Total Comments:</strong> {{ number_format($blog->comments()->count()) }}</div>
+                    @endif
+                </div>
+                <div style="margin-top: 12px; border-top: 1px dashed var(--line, #ebedf2); padding-top: 10px;">
+                    <button type="submit" form="resetViewsForm" class="btn small" style="background-color: var(--secondaryColor, #c79a2b) !important; color: #fff !important; width: auto; padding: 6px 12px; font-size: 11px; margin: 0;">Reset Views</button>
+                </div>
+            </div>
+        @endif
+
         <h3>Publishing</h3>
         <label>Status
             <select name="status">
@@ -171,6 +188,12 @@
 
     <button class="btn primary save-post">Save Post</button>
 </form>
+
+@if($blog->exists)
+    <form id="resetViewsForm" method="POST" action="{{ route('admin.blogs.reset-views', $blog) }}" onsubmit="return confirm('Are you sure you want to reset views for this post?');" style="display: none;">
+        @csrf
+    </form>
+@endif
 @include('admin.partials.tinymce')
 @push('scripts')
 <script>

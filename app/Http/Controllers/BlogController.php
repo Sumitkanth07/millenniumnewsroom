@@ -33,8 +33,6 @@ class BlogController extends Controller
         abort_unless($blog->is_published, 404);
         abort_unless((int) $blog->category_id === (int) $category->id, 404);
 
-        $blog->increment('views_count');
-
         $blog->load(['category', 'author', 'tags', 'seoSetting']);
         $canonicalUrl = $blog->canonical_url ?: $this->absoluteUrl(route('blog.category.show', [
             'category' => $blog->category?->slug ?: 'news',

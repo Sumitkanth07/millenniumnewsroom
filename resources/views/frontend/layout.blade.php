@@ -136,6 +136,7 @@
     </script>
     @endif
     @stack('head')
+    <meta name="google-site-verification" content="VxnnInXR42Safm3W-DIKiunWz4sQr5oGcW2SNJHdrMs" />
 </head>
 
 <body class="news-body">

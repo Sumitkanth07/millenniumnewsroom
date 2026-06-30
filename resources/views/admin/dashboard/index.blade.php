@@ -17,6 +17,22 @@
             <div class="row-line"><div><strong>{{ $blog->title }}</strong><span>{{ $blog->category?->name ?? 'Uncategorized' }} · {{ $blog->is_published ? 'Published' : 'Draft' }}</span></div><span class="badge">{{ number_format($blog->views_count) }} views</span></div>
         @endforeach
     </section>
+
+    <section class="panel">
+        <div class="section-head"><h3>Most Viewed Posts</h3><a href="{{ route('admin.blogs.index', ['sort' => 'views_desc']) }}">All Views</a></div>
+        @foreach($mostViewedBlogs as $blog)
+            <div class="row-line">
+                <div>
+                    <strong>{{ $blog->title }}</strong>
+                    <span>Published: {{ $blog->published_at ? $blog->published_at->format('d M Y') : 'Draft' }}</span>
+                </div>
+                <span class="badge gold">{{ number_format($blog->views_count) }} views</span>
+            </div>
+        @endforeach
+    </section>
+</div>
+
+<div style="margin-top: 24px;">
     <section class="panel">
         <h3>Trending Analytics</h3>
         <div class="chart-grid">
