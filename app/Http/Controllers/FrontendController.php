@@ -69,7 +69,7 @@ class FrontendController extends Controller
                     ->where('is_active', true)
                     ->whereHas('blogs', fn ($query) => $query->where('is_published', true), '>=', 4)
                     ->orderBy('sort_order')
-                    ->take(8)
+                    ->take(5)
                     ->get(),
                 'ads' => AdPlacement::where('is_active', true)->get()->keyBy('key'),
                 'metaTitle' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', Setting::getValue('site_title', 'MILLENNIUM NEWSROOM | Professional News Portal')),

@@ -161,20 +161,15 @@
             </div>
             
             <div class="responsive-grid-auto">
-                @php
-                    $bucketCategories = ['Politics', 'Healthcare', 'Entertainment', 'Technology', 'Opinion'];
-                @endphp
-                @foreach($bucketCategories as $catName)
+                @foreach($categories as $category)
                     <div style="background: rgba(255,255,255,0.6); padding: 24px; border-radius: 12px; border: 1px solid rgba(199,154,43,0.15);">
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #c79a2b; padding-bottom: 12px; margin-bottom: 20px;">
-                            <h3 style="font-family: Georgia, serif; font-size: 22px; margin: 0;">{{ $catName }}</h3>
-                            <a href="{{ route('category.show', \Illuminate\Support\Str::slug($catName)) }}" style="font-size: 12px; font-weight: bold; color: #c79a2b; text-transform: uppercase;">See All</a>
+                            <h3 style="font-family: Georgia, serif; font-size: 22px; margin: 0;">{{ $category->name }}</h3>
+                            <a href="{{ route('category.show', $category->slug) }}" style="font-size: 12px; font-weight: bold; color: #c79a2b; text-transform: uppercase;">See All</a>
                         </div>
                         
                         @php
-                            $catPosts = App\Models\Blog::with(['category', 'author'])->whereHas('category', function($q) use ($catName) {
-                                $q->where('name', $catName);
-                            })->latest('published_at')->take(4)->get();
+                            $catPosts = $category->blogs;
                         @endphp
                         
                         @if($catPosts->isEmpty())
