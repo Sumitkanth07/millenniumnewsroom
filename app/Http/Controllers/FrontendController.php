@@ -66,7 +66,11 @@ class FrontendController extends Controller
                 'popularTags' => Tag::withCount('blogs')->orderByDesc('blogs_count')->take(12)->get(),
                 'popularCategories' => Category::withCount('blogs')->where('is_active', true)->orderByDesc('blogs_count')->take(6)->get(),
                 'categories' => Category::with(['blogs' => fn ($query) => $query->where('is_published', true)->latest('published_at')->take(4)])
-                    ->where('is_active', true)->orderBy('sort_order')->take(8)->get(),
+                    ->where('is_active', true)
+                    ->whereHas('blogs', fn ($query) => $query->where('is_published', true), '>=', 4)
+                    ->orderBy('sort_order')
+                    ->take(8)
+                    ->get(),
                 'ads' => AdPlacement::where('is_active', true)->get()->keyBy('key'),
                 'metaTitle' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', Setting::getValue('site_title', 'MILLENNIUM NEWSROOM | Professional News Portal')),
                 'metaDescription' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', Setting::getValue('meta_description', 'MILLENNIUM NEWSROOM delivers business, markets, technology and public affairs journalism.')),

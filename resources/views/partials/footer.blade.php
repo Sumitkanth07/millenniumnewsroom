@@ -1,6 +1,13 @@
 @php
+    $dynamicCategories = \Illuminate\Support\Facades\Cache::remember('footer.categories.partial', 90, function() {
+        return \App\Models\Category::where('is_active', true)
+            ->whereHas('blogs', fn($q) => $q->where('is_published', true))
+            ->orderBy('name')
+            ->get();
+    });
+
     $footerColumns = [
-        'Categories' => ['News', 'Markets', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'],
+        'Categories' => $dynamicCategories,
         'Trending Topics' => ['Stock Market', 'Income Tax', 'Mutual Funds', 'IPO Watch', 'Gold Rates', 'AI News', 'Startup Funding'],
         'About Us' => ['About MILLENNIUM NEWSROOM', 'Advertise With Us', 'Careers', 'Press Releases', 'Investor Relations'],
         'Editorial Team' => ['Editor-in-Chief', 'Business Desk', 'Markets Desk', 'Opinion Editors', 'Corrections Policy'],
@@ -61,7 +68,11 @@
             <nav class="footer-column" aria-label="{{ $title }}">
                 <h3>{{ $title }}</h3>
                 @foreach ($links as $link)
-                    <a href="#">{{ $link }}</a>
+                    @if($title === 'Categories')
+                        <a href="{{ route('category.show', $link->slug) }}">{{ $link->name }}</a>
+                    @else
+                        <a href="#">{{ $link }}</a>
+                    @endif
                 @endforeach
             </nav>
         @endforeach

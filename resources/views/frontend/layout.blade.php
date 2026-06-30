@@ -256,15 +256,19 @@
 
             <h3>Categories</h3>
 
-            <a href="{{ route('category.show', \Illuminate\Support\Str::slug('Markets')) }}">
-                Markets
-            </a>
-            <a href="{{ route('category.show', \Illuminate\Support\Str::slug('Technology')) }}">
-                Technology
-            </a>
-            <a href="{{ route('category.show', \Illuminate\Support\Str::slug('Opinion')) }}">
-                Opinion
-            </a>
+            @php
+                $footerCategories = \Illuminate\Support\Facades\Cache::remember('footer.categories.frontend', 90, function() {
+                    return \App\Models\Category::where('is_active', true)
+                        ->whereHas('blogs', fn($q) => $q->where('is_published', true))
+                        ->orderBy('name')
+                        ->get();
+                });
+            @endphp
+            @foreach($footerCategories as $footerCategory)
+                <a href="{{ route('category.show', $footerCategory->slug) }}">
+                    {{ $footerCategory->name }}
+                </a>
+            @endforeach
 
         </div>
 
