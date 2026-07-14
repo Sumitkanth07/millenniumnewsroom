@@ -136,7 +136,7 @@
     </script>
     @endif
     @stack('head')
-    @if($adsenseClientId = \App\Models\Setting::getValue('adsense_client_id'))
+    @if($adsenseClientId = \App\Models\Setting::getValue('adsense_client_id', 'ca-pub-4398486915982313'))
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $adsenseClientId }}" crossorigin="anonymous"></script>
     @endif
     {!! \App\Models\Setting::getValue('google_analytics_code', '') !!}
