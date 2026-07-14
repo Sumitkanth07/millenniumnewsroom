@@ -103,10 +103,27 @@
             <a href="#related">Related stories</a>
         </aside>
 
-        <x-ad-slot :ads="$ads" placement="in_content_ad" label="In-content ad" />
+        <x-ad-slot placement="single_post_top" label="Single Post Top Ad" />
 
         <div id="story" class="content">
-            {!! $blog->content !!}
+            @php
+                $paragraphs = explode('</p>', $blog->content);
+            @endphp
+            @foreach($paragraphs as $index => $paragraph)
+                @if(trim($paragraph) !== '')
+                    {!! $paragraph !!}</p>
+                @endif
+                
+                @if($index === 2)
+                    <x-ad-slot placement="after_3rd_paragraph" label="After 3rd Paragraph Ad" />
+                @endif
+                @if($index === 4)
+                    <x-ad-slot placement="after_5th_paragraph" label="After 5th Paragraph Ad" />
+                @endif
+                @if($index === 6)
+                    <x-ad-slot placement="after_7th_paragraph" label="After 7th Paragraph Ad" />
+                @endif
+            @endforeach
         </div>
 
         @if($blog->gallery_images)
@@ -142,7 +159,7 @@
 
         @endif
 
-        <x-ad-slot :ads="$ads" placement="footer_ad" label="Footer ad" />
+        <x-ad-slot placement="before_related_posts" label="Before Related Posts Ad" />
 
         <div class="tags">
             @foreach($blog->tags as $tag)
@@ -176,9 +193,13 @@
 
         </section>
 
+        <x-ad-slot placement="after_related_posts" label="After Related Posts Ad" />
+
     </div>
 
     <aside class="sidebar">
+
+        <x-ad-slot placement="sidebar_top" label="Sidebar Top Ad" />
 
         <h2>Trending</h2>
 
@@ -193,6 +214,10 @@
             </a>
 
         @endforeach
+
+        <x-ad-slot placement="sidebar_middle" label="Sidebar Middle Ad" />
+
+        <x-ad-slot placement="sidebar_bottom" label="Sidebar Bottom Sticky Ad" :sticky="true" />
 
     </aside>
 

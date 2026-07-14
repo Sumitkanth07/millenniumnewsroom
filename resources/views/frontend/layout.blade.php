@@ -136,6 +136,37 @@
     </script>
     @endif
     @stack('head')
+    @if($adsenseClientId = \App\Models\Setting::getValue('adsense_client_id'))
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $adsenseClientId }}" crossorigin="anonymous"></script>
+    @endif
+    {!! \App\Models\Setting::getValue('google_analytics_code', '') !!}
+    {!! \App\Models\Setting::getValue('google_tag_manager_code', '') !!}
+    {!! \App\Models\Setting::getValue('microsoft_clarity_code', '') !!}
+    {!! \App\Models\Setting::getValue('facebook_pixel_code', '') !!}
+    {!! \App\Models\Setting::getValue('custom_header_code', '') !!}
+    
+    <style>
+    .portal-ad-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px auto;
+        overflow: hidden;
+        transition: height 0.3s ease;
+    }
+    .portal-ad-wrapper:empty {
+        display: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    @media (min-width: 992px) {
+        .sticky-sidebar-ad {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+    }
+    </style>
     <meta name="google-site-verification" content="VxnnInXR42Safm3W-DIKiunWz4sQr5oGcW2SNJHdrMs" />
 </head>
 
@@ -592,5 +623,34 @@
 
     @stack('scripts')
 
+    <!-- Advertisement Impression / Lazy Load Tracker -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const wrapper = entry.target;
+                    obs.unobserve(wrapper);
+                    
+                    const template = wrapper.querySelector('template');
+                    if (template) {
+                        const clone = template.content.cloneNode(true);
+                        wrapper.replaceChildren(clone);
+                    }
+                    
+                    const adId = wrapper.dataset.adId;
+                    if (adId) {
+                        fetch(`/ads/track-view/${adId}`)
+                            .catch(err => console.error('Ad tracking failed:', err));
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.portal-ad-wrapper').forEach(el => {
+            observer.observe(el);
+        });
+    });
+    </script>
 </body>
 </html>

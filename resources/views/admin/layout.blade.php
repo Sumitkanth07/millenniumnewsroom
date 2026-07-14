@@ -19,7 +19,13 @@
         <a href="{{ route('admin.authors.index') }}">Authors</a>
         <a href="{{ route('admin.pages.index') }}">Pages CMS</a>
         <a href="{{ route('admin.media.index') }}">Media Library</a>
-        <a href="{{ route('admin.ads.index') }}">Ad Management</a>
+        <div style="display: flex; flex-direction: column; padding: 5px 0;">
+            <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); padding: 5px 15px 5px 15px; font-weight: bold;">Advertisements</span>
+            <a href="{{ route('admin.advertisements.dashboard') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Ad Dashboard</a>
+            <a href="{{ route('admin.advertisements.index') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Placements</a>
+            <a href="{{ route('admin.advertisements.settings') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Settings</a>
+            <a href="{{ route('admin.advertisements.reports') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Reports</a>
+        </div>
         <a href="{{ route('admin.branding.edit') }}">Branding</a>
         <a href="{{ route('admin.navigation.index') }}">Navigation</a>
         <a href="{{ route('admin.footer.edit') }}">Footer Settings</a>

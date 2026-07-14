@@ -18,7 +18,12 @@ use App\Http\Controllers\Admin\RedirectController as AdminRedirectController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalculatorController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\AdvertisementController;
+use App\Http\Controllers\Admin\AdvertisementController as AdminAdvertisementController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/ads/track-view/{id}', [AdvertisementController::class, 'trackView'])->name('ads.track-view');
+Route::get('/ads/click/{id}', [AdvertisementController::class, 'trackClick'])->name('ads.track-click');
 
 Route::get('/google1104d3cf9cd3b0b9.html', function () {
     $path = public_path('google1104d3cf9cd3b0b9.html');
@@ -65,7 +70,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('pages/{page}/toggle-publish', [AdminPageController::class, 'togglePublish'])->name('pages.toggle-publish');
         Route::resource('pages', AdminPageController::class)->except(['show']);
         Route::resource('media', MediaLibraryController::class)->only(['index', 'store', 'destroy']);
-        Route::resource('ads', AdPlacementController::class)->except(['show']);
+        Route::get('advertisements/dashboard', [AdminAdvertisementController::class, 'dashboard'])->name('advertisements.dashboard');
+        Route::get('advertisements/settings', [AdminAdvertisementController::class, 'settings'])->name('advertisements.settings');
+        Route::post('advertisements/settings', [AdminAdvertisementController::class, 'saveSettings'])->name('advertisements.save-settings');
+        Route::get('advertisements/reports', [AdminAdvertisementController::class, 'reports'])->name('advertisements.reports');
+        Route::resource('advertisements', AdminAdvertisementController::class);
         Route::get('/calculator-settings', [CalculatorSettingController::class, 'edit'])->name('calculator.edit');
         Route::put('/calculator-settings', [CalculatorSettingController::class, 'update'])->name('calculator.update');
         Route::get('/branding', [BrandingController::class, 'edit'])->name('branding.edit');
