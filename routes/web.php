@@ -33,6 +33,17 @@ Route::get('/google1104d3cf9cd3b0b9.html', function () {
     return response(file_get_contents($path), 200, ['Content-Type' => 'text/html']);
 });
 
+Route::get('/ads.txt', function () {
+    $path = public_path('ads.txt');
+    if (!file_exists($path)) {
+        $path = base_path('ads.txt');
+    }
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'text/plain']);
+});
+
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/category/{category:slug}', [FrontendController::class, 'category'])->name('category.show');

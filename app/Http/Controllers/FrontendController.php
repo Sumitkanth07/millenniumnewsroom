@@ -65,7 +65,7 @@ class FrontendController extends Controller
                 'recommendedPosts' => (clone $published)->latest('views_count')->take(4)->get(),
                 'popularTags' => Tag::withCount('blogs')->orderByDesc('blogs_count')->take(12)->get(),
                 'popularCategories' => Category::withCount('blogs')->where('is_active', true)->orderByDesc('blogs_count')->take(6)->get(),
-                'categories' => Category::with(['blogs' => fn ($query) => $query->where('is_published', true)->latest('published_at')->take(4)])
+                'categories' => Category::with(['blogs' => fn ($query) => $query->where('is_published', true)->with(['category', 'author'])->latest('published_at')->take(4)])
                     ->where('is_active', true)
                     ->whereHas('blogs', fn ($query) => $query->where('is_published', true), '>=', 4)
                     ->orderBy('sort_order')
@@ -122,10 +122,20 @@ class FrontendController extends Controller
         $category->load('seoSetting');
         $posts = $category->blogs()->with(['category', 'author'])->where('is_published', true)->latest('published_at')->paginate(12);
 
+        $fallbackPosts = collect();
+        if ($posts->isEmpty()) {
+            $fallbackPosts = Blog::with(['category', 'author'])
+                ->where('is_published', true)
+                ->latest('published_at')
+                ->take(6)
+                ->get();
+        }
+
         return view('frontend.category', [
             'category' => $category,
             'featured' => $posts->first(),
             'posts' => $posts,
+            'fallbackPosts' => $fallbackPosts,
             'trendingPosts' => Blog::with('category')->where('is_published', true)->orderByDesc('views_count')->take(5)->get(),
             'metaTitle' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', $category->meta_title ?: $category->name.' News | MILLENNIUM NEWSROOM'),
             'metaDescription' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', $category->meta_description ?: 'Latest '.$category->name.' stories and analysis from MILLENNIUM NEWSROOM.'),

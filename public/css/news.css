@@ -26,3 +26,184 @@ html[data-theme="dark"] .content a:hover {
     color: #8ab4f8;
     text-decoration-color: #8ab4f8;
 }
+
+/* ==========================================================================
+   Mobile Responsiveness, UX/UI, and Performance Enhancements
+   ========================================================================== */
+
+/* 1. Cookie Consent Banner Mobile Redesign */
+.cookie-banner {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, sans-serif;
+    transition: all 0.3s ease-in-out;
+}
+@media (min-width: 641px) {
+    #cookieConsentBanner {
+        bottom: 24px !important;
+        right: 24px !important;
+        left: auto !important;
+        width: 450px !important;
+        padding: 20px !important;
+    }
+}
+@media (max-width: 640px) {
+    #cookieConsentBanner {
+        bottom: 12px !important;
+        right: 12px !important;
+        left: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+        padding: 12px !important;
+    }
+    #cookieConsentBanner h4 {
+        font-size: 15px !important;
+        margin-bottom: 6px !important;
+    }
+    #cookieConsentBanner p {
+        font-size: 11.5px !important;
+        line-height: 1.45 !important;
+        margin-bottom: 10px !important;
+    }
+    #cookieConsentSettings {
+        font-size: 11px !important;
+        margin-bottom: 10px !important;
+        padding-top: 8px !important;
+    }
+    #cookieConsentSettings div {
+        margin-bottom: 6px !important;
+    }
+    #cookieConsentBanner button {
+        padding: 6px 10px !important;
+        font-size: 11.5px !important;
+        flex: 1 1 auto;
+        text-align: center;
+    }
+}
+
+/* 2. Image Ratio & Cropping Prevention */
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.hero-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.mosaic-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.list-card img {
+    width: 100%;
+    height: 132px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+@media (max-width: 680px) {
+    .list-card img {
+        height: auto !important;
+        aspect-ratio: 16/9 !important;
+        object-fit: cover !important;
+    }
+}
+.fresh-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 3. Article View Layout & Readability */
+.article-image {
+    width: 100% !important;
+    max-height: 520px !important;
+    aspect-ratio: 16/9;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    margin-bottom: 16px;
+}
+.article .content {
+    font-size: 19px !important;
+    line-height: 1.8 !important;
+    color: inherit;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+.article .content p {
+    margin-bottom: 20px !important;
+}
+.article .content table {
+    width: 100% !important;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: 24px;
+}
+.article .content img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px;
+    margin: 16px 0;
+}
+@media (max-width: 768px) {
+    .article-image {
+        max-height: 350px !important;
+    }
+    .article .content {
+        font-size: 17.5px !important;
+        line-height: 1.7 !important;
+    }
+}
+@media (max-width: 480px) {
+    .article-image {
+        max-height: 220px !important;
+    }
+}
+
+/* 4. Social Sharing Link Buttons */
+.btn-share {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #ffffff !important;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    border: none;
+}
+.btn-share:hover {
+    transform: scale(1.08);
+}
+.btn-share.facebook { background-color: #1877F2; }
+.btn-share.facebook:hover { background-color: #166fe5; }
+.btn-share.x-twitter { background-color: #000000; }
+.btn-share.x-twitter:hover { background-color: #1a1a1a; }
+.btn-share.linkedin { background-color: #0A66C2; }
+.btn-share.linkedin:hover { background-color: #0959aa; }
+.btn-share.whatsapp { background-color: #25D366; }
+.btn-share.whatsapp:hover { background-color: #20ba5a; }
+.btn-share.telegram { background-color: #24A1DE; }
+.btn-share.telegram:hover { background-color: #1e87bb; }
+.btn-share.email { background-color: #6c757d; }
+.btn-share.email:hover { background-color: #5a6268; }
+.btn-share.copy { background-color: #c79a2b; color: #1f1a12 !important; }
+.btn-share.copy:hover { background-color: #b2841f; }
+
+/* 5. UX Enhancement Transitions & Touch Targets */
+.card, .fresh-card, .list-card, .mosaic-card {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.card:hover, .fresh-card:hover, .list-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 16px 36px rgba(36, 26, 12, 0.12) !important;
+}
+a, button {
+    min-height: 38px;
+    min-width: 38px;
+}
