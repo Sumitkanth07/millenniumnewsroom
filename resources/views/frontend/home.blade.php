@@ -283,6 +283,9 @@ html[data-theme=dark] section[style*="border-top"] > div > div {
         if (prevBtn) prevBtn.style.display = 'none';
         if (nextBtn) nextBtn.style.display = 'none';
         return;
+    } else {
+        if (prevBtn) prevBtn.style.display = 'block';
+        if (nextBtn) nextBtn.style.display = 'block';
     }
 
     let index = 0;

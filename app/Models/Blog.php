@@ -186,8 +186,7 @@ class Blog extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('is_published', true)
-            ->where('published_at', '<=', now());
+        return $query->where('is_published', true);
     }
 
     protected static function booted()
