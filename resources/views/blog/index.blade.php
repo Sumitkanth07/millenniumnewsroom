@@ -24,8 +24,10 @@
 
                     <img 
                         class="thumb"
-                        src="{{ asset($blog->featured_image ?: $blog->image) }}"
+                        src="{{ $blog->getThumbnailUrl() }}"
                         alt="{{ $blog->title }}"
+                        width="400"
+                        height="225"
                         loading="lazy">
 
                 @endif

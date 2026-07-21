@@ -12,7 +12,7 @@ class BlogController extends Controller
         return view('blog.index', [
 
             'blogs' => Blog::with(['category', 'author'])
-                ->where('is_published', true)
+                ->published()
                 ->latest('published_at')
                 ->paginate(9),
 
@@ -30,7 +30,7 @@ class BlogController extends Controller
 
     public function show(Category $category, Blog $blog)
     {
-        abort_unless($blog->is_published, 404);
+        abort_unless($blog->is_published && (!$blog->published_at || $blog->published_at->isPast()), 404);
         abort_unless((int) $blog->category_id === (int) $category->id, 404);
 
         $blog->load(['category', 'author', 'tags', 'seoSetting']);
@@ -42,7 +42,7 @@ class BlogController extends Controller
         $image = $this->absoluteAsset($blog->featured_image ?: $blog->image);
 
         $relatedPosts = Blog::with(['category', 'author'])
-            ->where('is_published', true)
+            ->published()
             ->whereKeyNot($blog->id)
             ->where('category_id', $blog->category_id)
             ->latest('published_at')
@@ -51,7 +51,7 @@ class BlogController extends Controller
 
         if ($relatedPosts->count() < 4) {
             $extra = Blog::with(['category', 'author'])
-                ->where('is_published', true)
+                ->published()
                 ->whereKeyNot($blog->id)
                 ->whereNotIn('id', $relatedPosts->pluck('id'))
                 ->latest('published_at')
@@ -67,7 +67,7 @@ class BlogController extends Controller
             'relatedPosts' => $relatedPosts,
 
             'trendingPosts' => Blog::with('category')
-                ->where('is_published', true)
+                ->published()
                 ->orderByDesc('views_count')
                 ->take(5)
                 ->get(),
@@ -79,7 +79,7 @@ class BlogController extends Controller
                 ?: $description,
 
             'robotsMeta' => $blog->robots_meta
-                ?: 'index,follow',
+                ?: 'index,follow,max-image-preview:large',
 
             'canonicalUrl' => $blog->canonical_url
                 ?: $canonicalUrl,

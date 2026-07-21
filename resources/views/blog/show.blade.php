@@ -73,6 +73,8 @@
                     <img 
                         src="{{ asset($blog->author->image) }}"
                         alt="{{ $blog->author->name }}"
+                        width="50"
+                        height="50"
                         loading="lazy">
                 @endif
 
@@ -98,6 +100,8 @@
                     src="{{ asset($showImg) }}"
                     alt="{{ $blog->featured_image_alt ?: $blog->title }}"
                     title="{{ $blog->featured_image_title ?: $blog->title }}"
+                    width="1200"
+                    height="675"
                     loading="eager"
                     fetchpriority="high"
                     decoding="async">

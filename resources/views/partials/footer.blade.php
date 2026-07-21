@@ -1,8 +1,10 @@
 @php
     $dynamicCategories = \Illuminate\Support\Facades\Cache::remember('footer.categories.partial', 90, function() {
         return \App\Models\Category::where('is_active', true)
-            ->whereHas('blogs', fn($q) => $q->where('is_published', true))
-            ->orderBy('name')
+            ->whereHas('blogs', fn($q) => $q->published())
+            ->withCount(['blogs' => fn($q) => $q->published()])
+            ->orderByDesc('blogs_count')
+            ->take(11)
             ->get();
     });
 
@@ -67,13 +69,18 @@
         @foreach ($footerColumns as $title => $links)
             <nav class="footer-column" aria-label="{{ $title }}">
                 <h3>{{ $title }}</h3>
-                @foreach ($links as $link)
-                    @if($title === 'Categories')
+                @if($title === 'Categories')
+                    @foreach ($links->take(10) as $link)
                         <a href="{{ route('category.show', $link->slug) }}">{{ $link->name }}</a>
-                    @else
-                        <a href="#">{{ $link }}</a>
+                    @endforeach
+                    @if($links->count() > 10)
+                        <a href="{{ route('sitemap.page') }}" style="color: #c79a2b; font-weight: bold;">View All Categories &rarr;</a>
                     @endif
-                @endforeach
+                @else
+                    @foreach ($links as $link)
+                        <a href="#">{{ $link }}</a>
+                    @endforeach
+                @endif
             </nav>
         @endforeach
     </div>

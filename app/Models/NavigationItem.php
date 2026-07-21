@@ -12,4 +12,15 @@ class NavigationItem extends Model
     {
         return ['is_active' => 'boolean'];
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($item) {
+            \Illuminate\Support\Facades\Cache::forget('navigation.items');
+        });
+
+        static::deleted(function ($item) {
+            \Illuminate\Support\Facades\Cache::forget('navigation.items');
+        });
+    }
 }

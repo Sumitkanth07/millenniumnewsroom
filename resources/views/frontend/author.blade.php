@@ -11,7 +11,7 @@
     </nav>
     <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
         @if($author->image)
-            <img src="{{ asset($author->image) }}" alt="{{ $author->name }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #c79a2b;">
+            <img src="{{ asset($author->image) }}" alt="{{ $author->name }}" width="120" height="120" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #c79a2b;">
         @else
             <div style="width: 120px; height: 120px; border-radius: 50%; background: #1f1a12; border: 2px solid #c79a2b; display: grid; place-items: center; color: #c79a2b; font-weight: bold; font-size: 36px; font-family: Georgia, serif;">{{ substr($author->name, 0, 1) }}</div>
         @endif
@@ -47,7 +47,7 @@
             @endphp
             <article class="list-card">
                 @if($image)
-                    <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy" decoding="async">
+                    <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->featured_image_alt ?: $post->title }}" width="800" height="450" loading="lazy" decoding="async">
                 @endif
                 <div>
                     <span>{{ optional($post->published_at)->format('M d, Y') }}</span>

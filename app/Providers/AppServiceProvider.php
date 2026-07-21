@@ -193,7 +193,10 @@ class AppServiceProvider extends ServiceProvider
 
             $robots = $shared['robotsMeta'] ?? $viewVariables['robotsMeta'] ?? null;
             if (empty($robots)) {
-                $robots = 'index,follow';
+                $robots = 'index,follow,max-image-preview:large';
+            }
+            if ($robots === 'index,follow') {
+                $robots = 'index,follow,max-image-preview:large';
             }
             $shared['robotsMeta'] = $robots;
 

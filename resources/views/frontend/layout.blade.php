@@ -469,30 +469,6 @@
     </script>
 
     <!-- Cookie Consent Popup -->
-    <style>
-        .cookie-banner {
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
-            transition: all 0.3s ease-in-out;
-        }
-        @media (min-width: 641px) {
-            #cookieConsentBanner {
-                bottom: 24px !important;
-                right: 24px !important;
-                left: auto !important;
-                width: 450px !important;
-            }
-        }
-        @media (max-width: 640px) {
-            #cookieConsentBanner {
-                bottom: 16px !important;
-                right: 16px !important;
-                left: 16px !important;
-                width: auto !important;
-                max-width: none !important;
-            }
-        }
-    </style>
 
     <div id="cookieConsentBanner" class="cookie-banner" style="display: none; position: fixed; bottom: 24px; right: 24px; left: 24px; max-width: 500px; background: #1f1a12; color: #efe5d1; border: 2px solid #c79a2b; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000; padding: 20px; box-sizing: border-box;">
         <h4 style="margin: 0 0 10px 0; color: #c79a2b; font-family: Georgia, serif; font-size: 18px; font-weight: bold;">Cookie Preferences</h4>

@@ -26,6 +26,8 @@
                     <img 
                         src="{{ asset($heroImage) }}"
                         alt="{{ $post->featured_image_alt ?: $post->title }}"
+                        width="1200"
+                        height="500"
                         loading="{{ $loop->first ? 'eager' : 'lazy' }}"
                         fetchpriority="{{ $loop->first ? 'high' : 'auto' }}"
                         decoding="async"
@@ -78,7 +80,7 @@
                         @endphp
                         <article class="mosaic-card @if($loop->first) large @endif">
                             @if($topImage)
-                                <img src="{{ $loop->first ? asset($topImage) : $post->getThumbnailUrl() }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                                <img src="{{ $loop->first ? asset($topImage) : $post->getThumbnailUrl() }}" alt="{{ $post->title }}" width="800" height="450" loading="lazy" decoding="async">
                             @endif
                             <div style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
                                 <span style="background: #c79a2b; color: #1f1a12; padding: 3px 8px; border-radius: 4px; font-size: 10px;">{{ $post->category?->name }}</span>
@@ -137,7 +139,7 @@
                     <article class="card" style="display: flex; flex-direction: column; height: 100%; padding: 0; overflow: hidden; background: rgba(255,255,255,0.9);">
                         @if($freshImage)
                             <a href="{{ $post->publicUrl() }}" style="display: block; height: 200px; overflow: hidden;">
-                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" width="400" height="225" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                             </a>
                         @endif
                         <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
@@ -187,7 +189,7 @@
                                 <div style="display: flex; gap: 16px; align-items: flex-start;">
                                     @if($img)
                                         <a href="{{ $post->publicUrl() }}" style="flex: 0 0 90px;">
-                                            <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" style="width: 90px; height: 70px; object-fit: cover; border-radius: 8px;" loading="lazy" decoding="async">
+                                            <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" width="90" height="70" style="width: 90px; height: 70px; object-fit: cover; border-radius: 8px;" loading="lazy" decoding="async">
                                         </a>
                                     @endif
                                     <div>
@@ -221,7 +223,7 @@
                     <article class="fresh-card" style="display: flex; flex-direction: column;">
                         <a class="story-thumb @unless($freshImage) placeholder @endunless" href="{{ $post->publicUrl() }}" style="height: 220px;">
                             @if($freshImage)
-                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" width="400" height="225" loading="lazy" decoding="async">
                             @else
                                 <span>{{ strtoupper(substr($post->category?->name ?? 'MN', 0, 2)) }}</span>
                             @endif
@@ -270,16 +272,29 @@ html[data-theme=dark] section[style*="border-top"] > div > div {
 </style>
 <script>
 (() => {
-    const slides = [...document.querySelectorAll('.hero-slide')];
+    const sliderContainer = document.querySelector('[data-slider]');
+    if (!sliderContainer) return;
+
+    const slides = [...sliderContainer.querySelectorAll('.hero-slide')];
+    const prevBtn = sliderContainer.querySelector('[data-slide-prev]');
+    const nextBtn = sliderContainer.querySelector('[data-slide-next]');
+    
+    if (slides.length <= 1) {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        return;
+    }
+
     let index = 0;
+    let slideInterval = null;
+
     const show = next => {
-        if (!slides.length) return;
         slides[index]?.classList.remove('active');
         index = (next + slides.length) % slides.length;
         slides[index]?.classList.add('active');
     };
-    
-    // Add Click listener to each slide so clicking outside title link still opens the article
+
+    // Click handler on the slide itself (excluding link clicks)
     slides.forEach(slide => {
         slide.addEventListener('click', (e) => {
             if (!e.target.closest('a') && !e.target.closest('button')) {
@@ -291,35 +306,71 @@ html[data-theme=dark] section[style*="border-top"] > div > div {
         });
     });
 
-    document.querySelector('[data-slide-next]')?.addEventListener('click', (e) => {
+    nextBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         show(index + 1);
-    }, {passive:true});
-    document.querySelector('[data-slide-prev]')?.addEventListener('click', (e) => {
+    });
+
+    prevBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         show(index - 1);
-    }, {passive:true});
-    
-    let slideInterval;
+    });
+
+    // Auto Play with pause-on-hover
     const startAutoPlay = () => {
-        if (slides.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            slideInterval = setInterval(() => show(index + 1), 6200);
+        if (!slideInterval && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            slideInterval = setInterval(() => show(index + 1), 6000);
         }
     };
+
     const stopAutoPlay = () => {
-        if (slideInterval) clearInterval(slideInterval);
+        if (slideInterval) {
+            clearInterval(slideInterval);
+            slideInterval = null;
+        }
     };
+
+    sliderContainer.addEventListener('mouseenter', stopAutoPlay);
+    sliderContainer.addEventListener('mouseleave', startAutoPlay);
+
+    // Touch Swipe support for mobile devices
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    sliderContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+
+    sliderContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        const threshold = 55;
+        if (touchEndX < touchStartX - threshold) {
+            show(index + 1); // Swipe left -> Next
+        } else if (touchEndX > touchStartX + threshold) {
+            show(index - 1); // Swipe right -> Prev
+        }
+    }, { passive: true });
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+        const rect = sliderContainer.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+        if (!isVisible) return;
+
+        if (e.key === 'ArrowRight') {
+            show(index + 1);
+        } else if (e.key === 'ArrowLeft') {
+            show(index - 1);
+        }
+    });
 
     startAutoPlay();
 
-    const sliderContainer = document.querySelector('[data-slider]');
-    if (sliderContainer) {
-        sliderContainer.addEventListener('mouseenter', stopAutoPlay);
-        sliderContainer.addEventListener('mouseleave', startAutoPlay);
-    }
-
+    // Intersection observer for fade/reveal components
     if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver(entries => entries.forEach(entry => entry.target.classList.toggle('visible', entry.isIntersecting)), {threshold:.12});
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => entry.target.classList.toggle('visible', entry.isIntersecting));
+        }, { threshold: 0.12 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     } else {
         document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));

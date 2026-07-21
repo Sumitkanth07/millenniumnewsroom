@@ -31,7 +31,7 @@
         @forelse($posts as $post)
             @php($image = $post->featured_image ?: $post->image)
             <article class="list-card">
-                @if($image)<img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->featured_image_alt ?: $post->title }}" loading="lazy" decoding="async">@endif
+                @if($image)<img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->featured_image_alt ?: $post->title }}" width="800" height="450" loading="lazy" decoding="async">@endif
                 <div><span>{{ $post->category?->name }}</span>   <h3><a href="{{ $post->publicUrl() }}">{{ $post->title }}</a></h3><p>{{ $post->excerpt }}</p></div>
             </article>
         @empty

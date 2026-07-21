@@ -23,4 +23,17 @@ class Page extends Model
     {
         return Str::slug($title) ?: 'page';
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($page) {
+            \Illuminate\Support\Facades\Cache::forget('frontend.home.payload');
+            \Illuminate\Support\Facades\Cache::forget('navigation.items');
+        });
+
+        static::deleted(function ($page) {
+            \Illuminate\Support\Facades\Cache::forget('frontend.home.payload');
+            \Illuminate\Support\Facades\Cache::forget('navigation.items');
+        });
+    }
 }

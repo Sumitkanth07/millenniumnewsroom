@@ -183,4 +183,23 @@ class Blog extends Model
 
         return $slug;
     }
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true)
+            ->where('published_at', '<=', now());
+    }
+
+    protected static function booted()
+    {
+        static::saved(function ($blog) {
+            \Illuminate\Support\Facades\Cache::forget('frontend.home.payload');
+            \Illuminate\Support\Facades\Cache::forget('footer.categories.partial');
+        });
+
+        static::deleted(function ($blog) {
+            \Illuminate\Support\Facades\Cache::forget('frontend.home.payload');
+            \Illuminate\Support\Facades\Cache::forget('footer.categories.partial');
+        });
+    }
 }

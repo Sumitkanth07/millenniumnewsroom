@@ -50,7 +50,7 @@ class FrontendController extends Controller
         }
 
         $payload = Cache::remember('frontend.home.payload', 90, function () {
-            $published = Blog::query()->where('is_published', true)->with(['category', 'author']);
+            $published = Blog::query()->published()->with(['category', 'author']);
 
             return [
                 'leadStory' => (clone $published)->where('is_featured', true)->latest('published_at')->first()
@@ -65,9 +65,9 @@ class FrontendController extends Controller
                 'recommendedPosts' => (clone $published)->latest('views_count')->take(4)->get(),
                 'popularTags' => Tag::withCount('blogs')->orderByDesc('blogs_count')->take(12)->get(),
                 'popularCategories' => Category::withCount('blogs')->where('is_active', true)->orderByDesc('blogs_count')->take(6)->get(),
-                'categories' => Category::with(['blogs' => fn ($query) => $query->where('is_published', true)->with(['category', 'author'])->latest('published_at')->take(4)])
+                'categories' => Category::with(['blogs' => fn ($query) => $query->published()->with(['category', 'author'])->latest('published_at')->take(4)])
                     ->where('is_active', true)
-                    ->whereHas('blogs', fn ($query) => $query->where('is_published', true), '>=', 4)
+                    ->whereHas('blogs', fn ($query) => $query->published(), '>=', 4)
                     ->orderBy('sort_order')
                     ->take(5)
                     ->get(),
@@ -96,7 +96,7 @@ class FrontendController extends Controller
         $category = $request->query('category');
         $sort = $request->query('sort', 'latest');
 
-        $posts = Blog::with(['category', 'author'])->where('is_published', true)
+        $posts = Blog::with(['category', 'author'])->published()
             ->when($query, fn ($builder) => $builder->where(fn ($inner) => $inner
                 ->where('title', 'like', "%{$query}%")
                 ->orWhere('excerpt', 'like', "%{$query}%")
@@ -120,12 +120,12 @@ class FrontendController extends Controller
     public function category(Category $category)
     {
         $category->load('seoSetting');
-        $posts = $category->blogs()->with(['category', 'author'])->where('is_published', true)->latest('published_at')->paginate(12);
+        $posts = $category->blogs()->with(['category', 'author'])->published()->latest('published_at')->paginate(12);
 
         $fallbackPosts = collect();
         if ($posts->isEmpty()) {
             $fallbackPosts = Blog::with(['category', 'author'])
-                ->where('is_published', true)
+                ->published()
                 ->latest('published_at')
                 ->take(6)
                 ->get();
@@ -136,7 +136,7 @@ class FrontendController extends Controller
             'featured' => $posts->first(),
             'posts' => $posts,
             'fallbackPosts' => $fallbackPosts,
-            'trendingPosts' => Blog::with('category')->where('is_published', true)->orderByDesc('views_count')->take(5)->get(),
+            'trendingPosts' => Blog::with('category')->published()->orderByDesc('views_count')->take(5)->get(),
             'metaTitle' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', $category->meta_title ?: $category->name.' News | MILLENNIUM NEWSROOM'),
             'metaDescription' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', $category->meta_description ?: 'Latest '.$category->name.' stories and analysis from MILLENNIUM NEWSROOM.'),
         ]);
@@ -147,9 +147,9 @@ class FrontendController extends Controller
         return view('frontend.html-sitemap', [
             'categories' => Category::withCount('blogs')->where('is_active', true)->orderBy('name')->get(),
             'pages' => Page::where('is_published', true)->orderBy('title')->get(),
-            'latestPosts' => Blog::with('category')->where('is_published', true)->latest('published_at')->take(20)->get(),
-            'popularPosts' => Blog::with('category')->where('is_published', true)->orderByDesc('views_count')->take(10)->get(),
-            'archives' => Blog::where('is_published', true)
+            'latestPosts' => Blog::with('category')->published()->latest('published_at')->take(20)->get(),
+            'popularPosts' => Blog::with('category')->published()->orderByDesc('views_count')->take(10)->get(),
+            'archives' => Blog::published()
                 ->selectRaw("DATE_FORMAT(published_at, '%Y-%m') as month")
                 ->groupBy('month')
                 ->orderByDesc('month')
@@ -179,7 +179,7 @@ class FrontendController extends Controller
 
         $posts = $author->blogs()
             ->with(['category', 'author'])
-            ->where('is_published', true)
+            ->published()
             ->latest('published_at')
             ->paginate(12);
 
@@ -193,7 +193,7 @@ class FrontendController extends Controller
 
     public function sitemap(): Response
     {
-        $blogs = Blog::with('category')->where('is_published', true)->latest('updated_at')->get(['id', 'category_id', 'slug', 'updated_at']);
+        $blogs = Blog::with('category')->published()->latest('updated_at')->get(['id', 'category_id', 'slug', 'updated_at']);
         $categories = Schema::hasTable('categories') ? Category::where('is_active', true)->get(['slug', 'updated_at']) : collect();
         $pages = Schema::hasTable('pages') ? Page::where('is_published', true)->get(['slug', 'updated_at']) : collect();
         $xml = view('frontend.sitemap', compact('blogs', 'categories', 'pages'))->render();
@@ -204,7 +204,7 @@ class FrontendController extends Controller
     public function newsSitemap(): Response
     {
         $blogs = Blog::with('category')
-            ->where('is_published', true)
+            ->published()
             ->whereNotNull('published_at')
             ->where('published_at', '>=', now()->subDays(2))
             ->latest('published_at')
@@ -230,7 +230,7 @@ class FrontendController extends Controller
         $urls[] = $appUrl . '/';
         $urls[] = $appUrl . '/blog';
 
-        $blogs = Blog::with('category')->where('is_published', true)->latest('updated_at')->get();
+        $blogs = Blog::with('category')->published()->latest('updated_at')->get();
         foreach ($blogs as $blog) {
             $urls[] = $appUrl . '/' . ($blog->category?->slug ?: 'news') . '/' . $blog->slug;
         }
@@ -258,7 +258,7 @@ class FrontendController extends Controller
         }
 
         $latestPosts = Blog::with('category')
-            ->where('is_published', true)
+            ->published()
             ->latest('published_at')
             ->take(20)
             ->get();

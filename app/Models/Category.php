@@ -49,4 +49,19 @@ class Category extends Model
     {
         return Str::slug($name) ?: 'category';
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($category) {
+            \Illuminate\Support\Facades\Cache::forget('frontend.home.payload');
+            \Illuminate\Support\Facades\Cache::forget('navigation.items');
+            \Illuminate\Support\Facades\Cache::forget('footer.categories.partial');
+        });
+
+        static::deleted(function ($category) {
+            \Illuminate\Support\Facades\Cache::forget('frontend.home.payload');
+            \Illuminate\Support\Facades\Cache::forget('navigation.items');
+            \Illuminate\Support\Facades\Cache::forget('footer.categories.partial');
+        });
+    }
 }
