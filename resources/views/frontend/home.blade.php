@@ -3,7 +3,7 @@
 @section('content')
 <section class="portal-home">
     @php
-        $sliderPosts = $featuredPosts->isNotEmpty() ? $featuredPosts : ($topHeadlines->isNotEmpty() ? $topHeadlines : $latestBlogs);
+        $sliderPosts = $featuredPosts->concat($topHeadlines)->concat($latestBlogs)->unique('id')->take(5);
         $sectionEnabled = fn (string $key) => $homepageSections->get($key)?->is_active ?? true;
     @endphp
 
@@ -284,8 +284,8 @@ html[data-theme=dark] section[style*="border-top"] > div > div {
         if (nextBtn) nextBtn.style.display = 'none';
         return;
     } else {
-        if (prevBtn) prevBtn.style.display = 'block';
-        if (nextBtn) nextBtn.style.display = 'block';
+        if (prevBtn) prevBtn.style.display = 'flex';
+        if (nextBtn) nextBtn.style.display = 'flex';
     }
 
     let index = 0;
