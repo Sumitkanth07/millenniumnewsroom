@@ -290,8 +290,10 @@
             @php
                 $footerCategories = \Illuminate\Support\Facades\Cache::remember('footer.categories.frontend', 90, function() {
                     return \App\Models\Category::where('is_active', true)
-                        ->whereHas('blogs', fn($q) => $q->where('is_published', true))
-                        ->orderBy('name')
+                        ->whereHas('blogs', fn($q) => $q->published())
+                        ->withCount(['blogs' => fn($q) => $q->published()])
+                        ->orderByDesc('blogs_count')
+                        ->take(10)
                         ->get();
                 });
             @endphp
@@ -300,6 +302,9 @@
                     {{ $footerCategory->name }}
                 </a>
             @endforeach
+            <a href="{{ route('categories.index') }}" style="color: #c79a2b; font-weight: bold; margin-top: 6px; display: inline-block;">
+                View All Categories &rarr;
+            </a>
 
         </div>
 

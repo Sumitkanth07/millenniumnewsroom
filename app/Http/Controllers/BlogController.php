@@ -41,24 +41,7 @@ class BlogController extends Controller
         $description = $blog->meta_description ?: ($blog->excerpt ?: (string) str($blog->content)->stripTags()->limit(160));
         $image = $this->absoluteAsset($blog->featured_image ?: $blog->image);
 
-        $relatedPosts = Blog::with(['category', 'author'])
-            ->published()
-            ->whereKeyNot($blog->id)
-            ->where('category_id', $blog->category_id)
-            ->latest('published_at')
-            ->take(4)
-            ->get();
-
-        if ($relatedPosts->count() < 4) {
-            $extra = Blog::with(['category', 'author'])
-                ->published()
-                ->whereKeyNot($blog->id)
-                ->whereNotIn('id', $relatedPosts->pluck('id'))
-                ->latest('published_at')
-                ->take(4 - $relatedPosts->count())
-                ->get();
-            $relatedPosts = $relatedPosts->concat($extra);
-        }
+        $relatedPosts = Blog::fetchWithFallback(4, [$blog->id], $blog->category_id);
 
         return view('blog.show', [
 

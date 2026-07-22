@@ -189,6 +189,94 @@ class Blog extends Model
         return $query->where('is_published', true);
     }
 
+    public static function fetchWithFallback(int $neededCount = 4, array $excludeIds = [], ?int $categoryId = null)
+    {
+        $results = collect();
+
+        // 1. Posts from same category
+        if ($categoryId) {
+            $catPosts = static::published()
+                ->with(['category', 'author'])
+                ->where('category_id', $categoryId)
+                ->whereNotIn('id', $excludeIds)
+                ->latest('published_at')
+                ->take($neededCount)
+                ->get();
+
+            $results = $results->concat($catPosts);
+            $excludeIds = array_merge($excludeIds, $results->pluck('id')->all());
+        }
+
+        // 2. Latest News
+        if ($results->count() < $neededCount) {
+            $latest = static::published()
+                ->with(['category', 'author'])
+                ->whereNotIn('id', $excludeIds)
+                ->latest('published_at')
+                ->take($neededCount - $results->count())
+                ->get();
+
+            $results = $results->concat($latest);
+            $excludeIds = array_merge($excludeIds, $results->pluck('id')->all());
+        }
+
+        // 3. Trending Posts
+        if ($results->count() < $neededCount) {
+            $trending = static::published()
+                ->with(['category', 'author'])
+                ->whereNotIn('id', $excludeIds)
+                ->orderByDesc('is_trending')
+                ->orderByDesc('views_count')
+                ->latest('published_at')
+                ->take($neededCount - $results->count())
+                ->get();
+
+            $results = $results->concat($trending);
+            $excludeIds = array_merge($excludeIds, $results->pluck('id')->all());
+        }
+
+        // 4. Most Viewed
+        if ($results->count() < $neededCount) {
+            $mostViewed = static::published()
+                ->with(['category', 'author'])
+                ->whereNotIn('id', $excludeIds)
+                ->orderByDesc('views_count')
+                ->take($neededCount - $results->count())
+                ->get();
+
+            $results = $results->concat($mostViewed);
+            $excludeIds = array_merge($excludeIds, $results->pluck('id')->all());
+        }
+
+        // 5. Editor's Picks
+        if ($results->count() < $neededCount) {
+            $featured = static::published()
+                ->with(['category', 'author'])
+                ->whereNotIn('id', $excludeIds)
+                ->where('is_featured', true)
+                ->latest('published_at')
+                ->take($neededCount - $results->count())
+                ->get();
+
+            $results = $results->concat($featured);
+            $excludeIds = array_merge($excludeIds, $results->pluck('id')->all());
+        }
+
+        // 6. Recent Articles
+        if ($results->count() < $neededCount) {
+            $recent = static::published()
+                ->with(['category', 'author'])
+                ->whereNotIn('id', $excludeIds)
+                ->latest('published_at')
+                ->take($neededCount - $results->count())
+                ->get();
+
+            $results = $results->concat($recent);
+        }
+
+        return $results;
+    }
+
     protected static function booted()
     {
         static::saved(function ($blog) {

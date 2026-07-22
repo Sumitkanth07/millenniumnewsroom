@@ -52,25 +52,67 @@ class FrontendController extends Controller
         $payload = Cache::remember('frontend.home.payload', 90, function () {
             $published = Blog::query()->published()->with(['category', 'author']);
 
+            $leadStory = (clone $published)->latest('published_at')->first();
+
+            $topHeadlines = (clone $published)->latest('published_at')->take(6)->get();
+            $latestBlogs = (clone $published)->latest('published_at')->take(12)->get();
+
+            $breakingPosts = (clone $published)->where('is_breaking', true)->latest('published_at')->take(6)->get();
+            if ($breakingPosts->count() < 6) {
+                $used = $breakingPosts->pluck('id')->toArray();
+                $breakingPosts = $breakingPosts->concat(Blog::fetchWithFallback(6 - $breakingPosts->count(), $used));
+            }
+
+            $trendingPosts = (clone $published)->where(fn ($q) => $q->where('is_trending', true)->orWhere('views_count', '>', 0))->orderByDesc('is_trending')->orderByDesc('views_count')->latest('published_at')->take(6)->get();
+            if ($trendingPosts->count() < 6) {
+                $used = $trendingPosts->pluck('id')->toArray();
+                $trendingPosts = $trendingPosts->concat(Blog::fetchWithFallback(6 - $trendingPosts->count(), $used));
+            }
+
+            $featuredPosts = (clone $published)->where('is_featured', true)->latest('published_at')->take(4)->get();
+            if ($featuredPosts->count() < 4) {
+                $used = $featuredPosts->pluck('id')->toArray();
+                $featuredPosts = $featuredPosts->concat(Blog::fetchWithFallback(4 - $featuredPosts->count(), $used));
+            }
+
+            $editorPicks = (clone $published)->where('is_featured', true)->orderByDesc('views_count')->take(6)->get();
+            if ($editorPicks->count() < 6) {
+                $used = $editorPicks->pluck('id')->toArray();
+                $editorPicks = $editorPicks->concat(Blog::fetchWithFallback(6 - $editorPicks->count(), $used));
+            }
+
+            $mostRead = (clone $published)->orderByDesc('views_count')->take(5)->get();
+            if ($mostRead->count() < 5) {
+                $used = $mostRead->pluck('id')->toArray();
+                $mostRead = $mostRead->concat(Blog::fetchWithFallback(5 - $mostRead->count(), $used));
+            }
+
+            $recommendedPosts = (clone $published)->latest('published_at')->take(4)->get();
+            if ($recommendedPosts->count() < 4) {
+                $used = $recommendedPosts->pluck('id')->toArray();
+                $recommendedPosts = $recommendedPosts->concat(Blog::fetchWithFallback(4 - $recommendedPosts->count(), $used));
+            }
+
+            $categories = Category::with(['blogs' => fn ($query) => $query->published()->with(['category', 'author'])->latest('published_at')->take(4)])
+                ->where('is_active', true)
+                ->whereHas('blogs', fn ($query) => $query->published())
+                ->orderBy('sort_order')
+                ->take(5)
+                ->get();
+
             return [
-                'leadStory' => (clone $published)->where('is_featured', true)->latest('published_at')->first()
-                    ?: (clone $published)->latest('published_at')->first(),
-                'breakingPosts' => (clone $published)->where('is_breaking', true)->latest('published_at')->take(6)->get(),
-                'topHeadlines' => (clone $published)->latest('published_at')->take(6)->get(),
-                'latestBlogs' => (clone $published)->latest('published_at')->take(12)->get(),
-                'trendingPosts' => (clone $published)->where(fn ($q) => $q->where('is_trending', true)->orWhere('views_count', '>', 0))->orderByDesc('is_trending')->orderByDesc('views_count')->latest('published_at')->take(6)->get(),
-                'featuredPosts' => (clone $published)->where('is_featured', true)->latest('published_at')->take(4)->get(),
-                'editorPicks' => (clone $published)->where('is_featured', true)->orderByDesc('views_count')->take(6)->get(),
-                'mostRead' => (clone $published)->orderByDesc('views_count')->take(5)->get(),
-                'recommendedPosts' => (clone $published)->latest('views_count')->take(4)->get(),
+                'leadStory' => $leadStory,
+                'breakingPosts' => $breakingPosts,
+                'topHeadlines' => $topHeadlines,
+                'latestBlogs' => $latestBlogs,
+                'trendingPosts' => $trendingPosts,
+                'featuredPosts' => $featuredPosts,
+                'editorPicks' => $editorPicks,
+                'mostRead' => $mostRead,
+                'recommendedPosts' => $recommendedPosts,
                 'popularTags' => Tag::withCount('blogs')->orderByDesc('blogs_count')->take(12)->get(),
                 'popularCategories' => Category::withCount('blogs')->where('is_active', true)->orderByDesc('blogs_count')->take(6)->get(),
-                'categories' => Category::with(['blogs' => fn ($query) => $query->published()->with(['category', 'author'])->latest('published_at')->take(4)])
-                    ->where('is_active', true)
-                    ->whereHas('blogs', fn ($query) => $query->published(), '>=', 4)
-                    ->orderBy('sort_order')
-                    ->take(5)
-                    ->get(),
+                'categories' => $categories,
                 'ads' => AdPlacement::where('is_active', true)->get()->keyBy('key'),
                 'metaTitle' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', Setting::getValue('site_title', 'MILLENNIUM NEWSROOM | Professional News Portal')),
                 'metaDescription' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', Setting::getValue('meta_description', 'MILLENNIUM NEWSROOM delivers business, markets, technology and public affairs journalism.')),
@@ -106,8 +148,11 @@ class FrontendController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $fallbackPosts = $posts->isEmpty() ? Blog::fetchWithFallback(6) : collect();
+
         return view('frontend.search', [
             'posts' => $posts,
+            'fallbackPosts' => $fallbackPosts,
             'query' => $query,
             'selectedCategory' => $category,
             'sort' => $sort,
@@ -122,23 +167,52 @@ class FrontendController extends Controller
         $category->load('seoSetting');
         $posts = $category->blogs()->with(['category', 'author'])->published()->latest('published_at')->paginate(12);
 
-        $fallbackPosts = collect();
+        $fallbackData = [];
         if ($posts->isEmpty()) {
-            $fallbackPosts = Blog::with(['category', 'author'])
-                ->published()
-                ->latest('published_at')
-                ->take(6)
-                ->get();
+            $used = [];
+            $latestNews = Blog::fetchWithFallback(4, $used);
+            $used = array_merge($used, $latestNews->pluck('id')->all());
+
+            $trendingStories = Blog::fetchWithFallback(4, $used);
+            $used = array_merge($used, $trendingStories->pluck('id')->all());
+
+            $editorPicks = Blog::fetchWithFallback(4, $used);
+            $used = array_merge($used, $editorPicks->pluck('id')->all());
+
+            $recentArticles = Blog::fetchWithFallback(4, $used);
+
+            $fallbackData = [
+                'latestNews' => $latestNews,
+                'trendingStories' => $trendingStories,
+                'editorPicks' => $editorPicks,
+                'recentArticles' => $recentArticles,
+            ];
         }
 
         return view('frontend.category', [
             'category' => $category,
             'featured' => $posts->first(),
             'posts' => $posts,
-            'fallbackPosts' => $fallbackPosts,
+            'fallbackData' => $fallbackData,
             'trendingPosts' => Blog::with('category')->published()->orderByDesc('views_count')->take(5)->get(),
             'metaTitle' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', $category->meta_title ?: $category->name.' News | MILLENNIUM NEWSROOM'),
             'metaDescription' => str_ireplace('MILLENNIUM NEWSROOM', 'MILLENNIUM NEWSROOM', $category->meta_description ?: 'Latest '.$category->name.' stories and analysis from MILLENNIUM NEWSROOM.'),
+        ]);
+    }
+
+    public function allCategories()
+    {
+        $categories = Category::withCount(['blogs' => fn ($q) => $q->published()])
+            ->where('is_active', true)
+            ->orderByDesc('blogs_count')
+            ->orderBy('name')
+            ->get();
+
+        return view('frontend.categories', [
+            'categories' => $categories,
+            'recentNews' => Blog::fetchWithFallback(6),
+            'metaTitle' => 'All Categories | MILLENNIUM NEWSROOM',
+            'metaDescription' => 'Explore all news categories, topics, markets, policy, business, technology and opinion sections on MILLENNIUM NEWSROOM.',
         ]);
     }
 
@@ -183,9 +257,12 @@ class FrontendController extends Controller
             ->latest('published_at')
             ->paginate(12);
 
+        $fallbackPosts = $posts->isEmpty() ? Blog::fetchWithFallback(6) : collect();
+
         return view('frontend.author', [
             'author' => $author,
             'posts' => $posts,
+            'fallbackPosts' => $fallbackPosts,
             'metaTitle' => $author->name . ' | Author Profile | MILLENNIUM NEWSROOM',
             'metaDescription' => $author->bio ?: 'Read articles published by ' . $author->name . ' on MILLENNIUM NEWSROOM.',
         ]);

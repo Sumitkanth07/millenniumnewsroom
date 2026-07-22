@@ -47,6 +47,7 @@ Route::get('/ads.txt', function () {
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/category/{category:slug}', [FrontendController::class, 'category'])->name('category.show');
+Route::get('/categories', [FrontendController::class, 'allCategories'])->name('categories.index');
 Route::get('/sitemap', [FrontendController::class, 'htmlSitemap'])->name('sitemap.page');
 Route::get('/page/{page:slug}', [FrontendController::class, 'page'])->name('page.show');
 Route::get('/author/{author:slug}', [FrontendController::class, 'author'])->name('author.show');

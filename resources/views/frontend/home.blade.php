@@ -3,7 +3,7 @@
 @section('content')
 <section class="portal-home">
     @php
-        $sliderPosts = $featuredPosts->concat($topHeadlines)->concat($latestBlogs)->unique('id')->take(5);
+        $sliderPosts = $featuredPosts->concat($topHeadlines)->concat($latestBlogs)->unique('id')->sortByDesc('published_at')->values()->take(5);
         $sectionEnabled = fn (string $key) => $homepageSections->get($key)?->is_active ?? true;
     @endphp
 
@@ -172,11 +172,11 @@
                         
                         @php
                             $catPosts = $category->blogs;
+                            if ($catPosts->count() < 4) {
+                                $usedIds = $catPosts->pluck('id')->toArray();
+                                $catPosts = $catPosts->concat(\App\Models\Blog::fetchWithFallback(4 - $catPosts->count(), $usedIds, $category->id));
+                            }
                         @endphp
-                        
-                        @if($catPosts->isEmpty())
-                            <p class="muted" style="font-size: 14px; font-style: italic;">No posts available yet.</p>
-                        @endif
                         
                         <div style="display: flex; flex-direction: column; gap: 20px;">
                             @foreach($catPosts as $post)

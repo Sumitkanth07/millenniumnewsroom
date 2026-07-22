@@ -4,7 +4,7 @@
             ->whereHas('blogs', fn($q) => $q->published())
             ->withCount(['blogs' => fn($q) => $q->published()])
             ->orderByDesc('blogs_count')
-            ->take(11)
+            ->take(10)
             ->get();
     });
 
@@ -73,9 +73,7 @@
                     @foreach ($links->take(10) as $link)
                         <a href="{{ route('category.show', $link->slug) }}">{{ $link->name }}</a>
                     @endforeach
-                    @if($links->count() > 10)
-                        <a href="{{ route('sitemap.page') }}" style="color: #c79a2b; font-weight: bold;">View All Categories &rarr;</a>
-                    @endif
+                    <a href="{{ route('categories.index') }}" style="color: #c79a2b; font-weight: bold; margin-top: 6px; display: inline-block;">View All Categories &rarr;</a>
                 @else
                     @foreach ($links as $link)
                         <a href="#">{{ $link }}</a>
