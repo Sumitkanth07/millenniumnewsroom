@@ -241,16 +241,11 @@
 
                 <div class="ticker-track">
 
-                    @foreach($breakingPosts as $post)
-
+                    @foreach($breakingPosts->concat($breakingPosts) as $post)
                         <a href="{{ $post->publicUrl() }}">
                             {{ $post->title }}
                         </a>
-
-                        @if(!$loop->last)
-                            <span>•</span>
-                        @endif
-
+                        <span>•</span>
                     @endforeach
 
                 </div>

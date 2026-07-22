@@ -207,3 +207,75 @@ a, button {
     min-height: 38px;
     min-width: 38px;
 }
+
+/* Robust Breaking News Ticker CSS Fix */
+.ticker {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 10px 24px !important;
+    background: #fff6db !important;
+    border-bottom: 1px solid #ead59d !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+html[data-theme="dark"] .ticker {
+    background: #181511 !important;
+    border-color: #3a2f1b !important;
+}
+
+.ticker strong {
+    color: #8c1919 !important;
+    text-transform: uppercase !important;
+    font-weight: 800 !important;
+    flex-shrink: 0 !important;
+    letter-spacing: 0.5px !important;
+    font-size: 13px !important;
+}
+
+.ticker-track {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    white-space: nowrap !important;
+    width: max-content !important;
+    flex-shrink: 0 !important;
+    animation: tickerMove 30s linear infinite !important;
+}
+
+.ticker-track a {
+    font-weight: 700 !important;
+    color: #3a2205 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 14px !important;
+    display: inline-block !important;
+}
+
+html[data-theme="dark"] .ticker-track a {
+    color: #f6ecd6 !important;
+}
+
+.ticker-track span {
+    color: #9d7318 !important;
+    flex-shrink: 0 !important;
+    font-size: 12px !important;
+    margin: 0 4px !important;
+}
+
+.ticker:hover .ticker-track {
+    animation-play-state: paused !important;
+}
+
+@keyframes tickerMove {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
