@@ -47,7 +47,7 @@ class ProfessionalContentSeeder extends Seeder
             Setting::setValue($key, $value);
         }
 
-        $categories = collect(['News', 'Markets', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'])
+        $categories = collect(['News', 'CXO View', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'])
             ->mapWithKeys(function (string $name, int $index) {
                 return [$name => Category::updateOrCreate(
                     ['slug' => Str::slug($name)],

@@ -218,14 +218,14 @@
 
         <nav class="site-nav mega-nav">
 
-            <a href="{{ route('category.show', 'news') }}" class="nav-link">News</a>
-            <a href="{{ route('category.show', 'markets') }}" class="nav-link">Markets</a>
-            <a href="{{ route('category.show', 'technology') }}" class="nav-link">Technology</a>
-            <a href="{{ route('category.show', 'opinion') }}" class="nav-link">Opinion</a>
-            <a href="{{ route('page.show', 'about-us') }}" class="nav-link">About Us</a>
-            <a href="{{ route('page.show', 'privacy-policy') }}" class="nav-link">Privacy Policy</a>
-            <a href="{{ route('page.show', 'terms') }}" class="nav-link">Terms</a>
-            <a href="{{ route('page.show', 'contact') }}" class="nav-link">Contact</a>
+            <a href="{{ route('category.show', 'news') }}" class="nav-link {{ request()->is('category/news*') ? 'active' : '' }}">News</a>
+            <a href="{{ route('category.show', 'cxo-view') }}" class="nav-link {{ request()->is('category/cxo-view*') ? 'active' : '' }}">CXO View</a>
+            <a href="{{ route('category.show', 'technology') }}" class="nav-link {{ request()->is('category/technology*') ? 'active' : '' }}">Technology</a>
+            <a href="{{ route('category.show', 'opinion') }}" class="nav-link {{ request()->is('category/opinion*') ? 'active' : '' }}">Opinion</a>
+            <a href="{{ route('page.show', 'about-us') }}" class="nav-link {{ request()->is('page/about-us*') ? 'active' : '' }}">About Us</a>
+            <a href="{{ route('page.show', 'privacy-policy') }}" class="nav-link {{ request()->is('page/privacy-policy*') ? 'active' : '' }}">Privacy Policy</a>
+            <a href="{{ route('page.show', 'terms') }}" class="nav-link {{ request()->is('page/terms*') ? 'active' : '' }}">Terms</a>
+            <a href="{{ route('page.show', 'contact') }}" class="nav-link {{ request()->is('page/contact*') ? 'active' : '' }}">Contact</a>
 
         </nav>
 

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'items' => ['News', 'Markets', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'],
+    'items' => ['News', 'CXO View', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'],
 
     'breaking' => [
         'RBI policy panel to meet next week as inflation cools',
@@ -21,7 +21,7 @@ return [
                 ['category' => 'World', 'title' => 'Global markets await central bank signals after mixed data', 'image' => 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=600&q=80', 'summary' => 'Investors are watching bonds, currencies and commodities.'],
             ],
         ],
-        'Markets' => [
+        'CXO View' => [
             'columns' => [
                 ['heading' => 'Market Data', 'links' => ['Stock Market', 'Indices', 'Top Gainers', 'Top Losers']],
                 ['heading' => 'Asset Classes', 'links' => ['Commodities', 'Currencies', 'Bonds', 'Gold Rates']],

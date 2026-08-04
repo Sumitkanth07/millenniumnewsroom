@@ -80,7 +80,7 @@ class DatabaseSeeder extends Seeder
             'copyright_text' => '(c) '.date('Y').' MILLENNIUM NEWSROOM. All rights reserved.',
         ]);
 
-        $categories = collect(['News', 'Markets', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'])
+        $categories = collect(['News', 'CXO View', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle'])
             ->mapWithKeys(fn ($name, $index) => [$name => Category::updateOrCreate(
                 ['slug' => str($name)->slug()->toString()],
                 ['name' => $name, 'sort_order' => $index + 1, 'order' => $index + 1, 'is_active' => true, 'meta_title' => $name.' News | MILLENNIUM NEWSROOM', 'meta_description' => 'Latest '.$name.' coverage from MILLENNIUM NEWSROOM.']

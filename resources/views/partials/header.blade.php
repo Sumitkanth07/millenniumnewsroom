@@ -1,5 +1,5 @@
 @php
-    $navigation = $navItems ?? config('navigation.items', ['News', 'Markets', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle']);
+    $navigation = $navItems ?? config('navigation.items', ['News', 'CXO View', 'Technology', 'Companies', 'Politics', 'Opinion', 'Sports', 'Lifestyle']);
     $tickerItems = $breakingNews ?? config('navigation.breaking', [
         'Markets open higher as banks and energy shares advance',
         'Gold prices hold steady ahead of global rate signals',
@@ -67,18 +67,24 @@
         <div class="container main-nav__inner">
             <ul class="nav-list nav-list--desktop">
                 @foreach ($navigation as $item)
+                    @php
+                        $itemLabel = is_object($item) ? $item->label : $item;
+                        $itemSlug = Str::slug($itemLabel);
+                        $itemUrl = is_object($item) && !empty($item->url) ? url($item->url) : route('category.show', $itemSlug);
+                        $isActive = request()->is('category/' . $itemSlug . '*');
+                    @endphp
                     <li class="nav-item">
-                        <a class="nav-link" href="#">{{ $item }}</a>
+                        <a class="nav-link {{ $isActive ? 'active' : '' }}" href="{{ $itemUrl }}">{{ $itemLabel }}</a>
 
-                        @if (isset($menuSections[$item]))
-                            <div class="mega-menu" aria-label="{{ $item }} menu">
+                        @if (isset($menuSections[$itemLabel]))
+                            <div class="mega-menu" aria-label="{{ $itemLabel }} menu">
                                 <div class="mega-menu__intro">
-                                    <strong>{{ $item }}</strong>
+                                    <strong>{{ $itemLabel }}</strong>
                                     <span>Newspaper-style coverage, sharp analysis and curated reads.</span>
                                 </div>
 
                                 <div class="mega-menu__columns">
-                                    @foreach ($menuSections[$item]['columns'] ?? [] as $column)
+                                    @foreach ($menuSections[$itemLabel]['columns'] ?? [] as $column)
                                         <section class="mega-column">
                                             <h3>{{ $column['heading'] }}</h3>
                                             @foreach ($column['links'] as $link)
@@ -89,7 +95,7 @@
                                 </div>
 
                                 <div class="mega-menu__featured">
-                                    @foreach ($menuSections[$item]['featured'] ?? [] as $post)
+                                    @foreach ($menuSections[$itemLabel]['featured'] ?? [] as $post)
                                         <a class="mega-featured-card" href="#">
                                             <img src="{{ $post['image'] }}" alt="{{ $post['title'] }}">
                                             <span class="section-kicker">{{ $post['category'] }}</span>
@@ -110,11 +116,16 @@
                 </div>
 
                 @foreach ($navigation as $item)
+                    @php
+                        $itemLabel = is_object($item) ? $item->label : $item;
+                        $itemSlug = Str::slug($itemLabel);
+                        $itemUrl = is_object($item) && !empty($item->url) ? url($item->url) : route('category.show', $itemSlug);
+                    @endphp
                     <details class="mobile-menu__group">
-                        <summary>{{ $item }}</summary>
-                        @if (isset($menuSections[$item]))
+                        <summary><a href="{{ $itemUrl }}" style="color: inherit; text-decoration: none;">{{ $itemLabel }}</a></summary>
+                        @if (isset($menuSections[$itemLabel]))
                             <div class="mobile-menu__columns">
-                                @foreach ($menuSections[$item]['columns'] ?? [] as $column)
+                                @foreach ($menuSections[$itemLabel]['columns'] ?? [] as $column)
                                     <section>
                                         <h3>{{ $column['heading'] }}</h3>
                                         @foreach ($column['links'] as $link)
@@ -124,7 +135,7 @@
                                 @endforeach
                             </div>
                             <div class="mobile-featured">
-                                @foreach ($menuSections[$item]['featured'] ?? [] as $post)
+                                @foreach ($menuSections[$itemLabel]['featured'] ?? [] as $post)
                                     <a href="#">
                                         <span class="section-kicker">{{ $post['category'] }}</span>
                                         <strong>{{ $post['title'] }}</strong>

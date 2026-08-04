@@ -604,7 +604,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $categoryUrls = [
             'News' => '/category/news',
-            'Markets' => '/category/markets',
+            'CXO View' => '/category/cxo-view',
             'Technology' => '/category/technology',
             'Companies' => '/category/companies',
             'Politics' => '/category/politics',
