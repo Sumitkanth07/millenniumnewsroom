@@ -55,10 +55,7 @@
         $appUrl = rtrim(config('app.url'), '/');
         $shareImage = $ogImage ?? ($logo ? url(asset($logo)) : null);
         if ($shareImage && !str_starts_with($shareImage, 'http://') && !str_starts_with($shareImage, 'https://')) {
-            $shareImage = $appUrl.'/'.ltrim($shareImage, '/');
-        }
-        if ($shareImage) {
-            $shareImage = preg_replace('#(https?://[^/]+)/public/#i', '$1/', $shareImage);
+            $shareImage = url(asset(ltrim($shareImage, '/')));
         }
         $shareImageSecure = $shareImage ? preg_replace('#^http://#i', 'https://', $shareImage) : null;
         

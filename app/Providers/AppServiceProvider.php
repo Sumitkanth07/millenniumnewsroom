@@ -122,10 +122,16 @@ class AppServiceProvider extends ServiceProvider
 
                 $shareImage = $seo->og_image;
                 if ($shareImage) {
-                    if (!str_starts_with($shareImage, 'http://') && !str_starts_with($shareImage, 'https://')) {
-                        $shareImage = rtrim((string) config('app.url'), '/').'/'.ltrim($shareImage, '/');
+                    $localPath = ltrim(parse_url($shareImage, PHP_URL_PATH) ?? '', '/');
+                    $localPathClean = preg_replace('#^public/#i', '', $localPath);
+                    $exists = file_exists(public_path($localPath)) || file_exists(public_path($localPathClean));
+                    
+                    if ($exists || str_starts_with($shareImage, 'http://') || str_starts_with($shareImage, 'https://')) {
+                        if (!str_starts_with($shareImage, 'http://') && !str_starts_with($shareImage, 'https://')) {
+                            $shareImage = url(asset(ltrim($shareImage, '/')));
+                        }
+                        $shared['ogImage'] = $shareImage;
                     }
-                    $shared['ogImage'] = $shareImage;
                 }
 
                 // Retrieve Twitter overrides from JSON data
@@ -138,10 +144,16 @@ class AppServiceProvider extends ServiceProvider
                     }
                     if (!empty($seo->schema_data['twitter_image'])) {
                         $twImg = $seo->schema_data['twitter_image'];
-                        if (!str_starts_with($twImg, 'http://') && !str_starts_with($twImg, 'https://')) {
-                            $twImg = rtrim((string) config('app.url'), '/').'/'.ltrim($twImg, '/');
+                        $twPath = ltrim(parse_url($twImg, PHP_URL_PATH) ?? '', '/');
+                        $twPathClean = preg_replace('#^public/#i', '', $twPath);
+                        $twExists = file_exists(public_path($twPath)) || file_exists(public_path($twPathClean));
+
+                        if ($twExists || str_starts_with($twImg, 'http://') || str_starts_with($twImg, 'https://')) {
+                            if (!str_starts_with($twImg, 'http://') && !str_starts_with($twImg, 'https://')) {
+                                $twImg = url(asset(ltrim($twImg, '/')));
+                            }
+                            $shared['twitterImage'] = $twImg;
                         }
-                        $shared['twitterImage'] = $twImg;
                     }
                 }
 
