@@ -169,6 +169,19 @@ class AppServiceProvider extends ServiceProvider
                 $blog = $viewVariables['blog'];
                 $fallbackTitle = $blog->title;
                 $fallbackDescription = $blog->excerpt ?: (string) str($blog->content)->stripTags()->limit(155);
+                if (empty($shared['ogImage']) && empty($viewVariables['ogImage'])) {
+                    $blogImg = $blog->featured_image ?: $blog->image;
+                    if ($blogImg) {
+                        $cleanBlogImg = ltrim($blogImg, '/');
+                        if (!str_starts_with($cleanBlogImg, 'http://') && !str_starts_with($cleanBlogImg, 'https://')) {
+                            if (!str_starts_with($cleanBlogImg, 'public/')) {
+                                $cleanBlogImg = 'public/' . $cleanBlogImg;
+                            }
+                            $cleanBlogImg = rtrim((string) config('app.url'), '/') . '/' . $cleanBlogImg;
+                        }
+                        $shared['ogImage'] = $cleanBlogImg;
+                    }
+                }
             } elseif (isset($viewVariables['page']) && $viewVariables['page'] instanceof \App\Models\Page) {
                 $page = $viewVariables['page'];
                 $fallbackTitle = $page->title;

@@ -93,8 +93,11 @@ class BlogController extends Controller
         }
 
         $cleanPath = ltrim($path, '/');
+        if (! str_starts_with($cleanPath, 'public/')) {
+            $cleanPath = 'public/' . $cleanPath;
+        }
 
-        return url(asset($cleanPath));
+        return $this->absoluteUrl($cleanPath);
     }
 
     private function absoluteUrl(string $path): string
