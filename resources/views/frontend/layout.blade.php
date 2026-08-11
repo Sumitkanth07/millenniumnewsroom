@@ -57,6 +57,26 @@
         if ($shareImage && !str_starts_with($shareImage, 'http://') && !str_starts_with($shareImage, 'https://')) {
             $shareImage = $appUrl.'/'.ltrim($shareImage, '/');
         }
+        if ($shareImage) {
+            $shareImage = preg_replace('#(https?://[^/]+)/public/#i', '$1/', $shareImage);
+        }
+        $shareImageSecure = $shareImage ? preg_replace('#^http://#i', 'https://', $shareImage) : null;
+        
+        $shareImageMime = 'image/jpeg';
+        if ($shareImage) {
+            $parsedPath = parse_url($shareImage, PHP_URL_PATH) ?? '';
+            $ext = strtolower(pathinfo($parsedPath, PATHINFO_EXTENSION));
+            if ($ext === 'webp') {
+                $shareImageMime = 'image/webp';
+            } elseif ($ext === 'png') {
+                $shareImageMime = 'image/png';
+            } elseif ($ext === 'gif') {
+                $shareImageMime = 'image/gif';
+            } elseif ($ext === 'svg') {
+                $shareImageMime = 'image/svg+xml';
+            }
+        }
+
         $canonical = $canonicalUrl ?? $appUrl.'/'.ltrim(request()->path(), '/');
         
         $logoExt = $logo ? pathinfo($logo, PATHINFO_EXTENSION) : null;
@@ -106,7 +126,10 @@
 
     @if($shareImage)
         <meta property="og:image" content="{{ $shareImage }}">
-        <meta property="og:image:secure_url" content="{{ $shareImage }}">
+        <meta property="og:image:secure_url" content="{{ $shareImageSecure }}">
+        <meta property="og:image:type" content="{{ $shareImageMime }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
         <meta property="og:image:alt" content="{{ $metaTitle ?? $siteTitle }}">
     @endif
 

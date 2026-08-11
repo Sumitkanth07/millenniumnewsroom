@@ -89,10 +89,27 @@ class BlogController extends Controller
         }
 
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            $parts = parse_url($path);
+            if (isset($parts['path'])) {
+                $encodedPath = implode('/', array_map('rawurlencode', explode('/', $parts['path'])));
+                $scheme = isset($parts['scheme']) ? $parts['scheme'] . '://' : 'https://';
+                $host = $parts['host'] ?? '';
+                $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+                $query = isset($parts['query']) ? '?' . $parts['query'] : '';
+                return $scheme . $host . $port . $encodedPath . $query;
+            }
             return $path;
         }
 
-        return $this->absoluteUrl('/public/'.ltrim($path, '/'));
+        $cleanPath = ltrim($path, '/');
+        if (str_starts_with($cleanPath, 'public/')) {
+            $cleanPath = substr($cleanPath, 7);
+        }
+
+        $segments = array_map('rawurlencode', explode('/', $cleanPath));
+        $encodedPath = implode('/', $segments);
+
+        return $this->absoluteUrl($encodedPath);
     }
 
     private function absoluteUrl(string $path): string
