@@ -217,9 +217,28 @@ class NewsletterController extends Controller
         try {
             Mail::to($validated['email'])->send(new TestNewsletterMail());
 
-            return back()->with('status', "Test email sent successfully to {$validated['email']}.");
+            $driver = config('mail.default');
+            if ($driver === 'log') {
+                return back()->with('status', "Test email processed via local 'log' driver (written to storage/logs/laravel.log). Configure MAIL_MAILER=smtp in .env for real SMTP delivery.");
+            }
+
+            return back()->with('status', "Test email sent successfully via SMTP to {$validated['email']}.");
         } catch (\Throwable $e) {
-            return back()->withErrors(['email' => 'Failed to send test email: ' . $e->getMessage()]);
+            $msg = $e->getMessage();
+            $smtpPass = (string) config('mail.mailers.smtp.password');
+            if ($smtpPass !== '') {
+                $msg = str_replace($smtpPass, '********', $msg);
+            }
+
+            if (str_contains(strtolower($msg), 'auth') || str_contains(strtolower($msg), '535') || str_contains(strtolower($msg), 'credential')) {
+                $errorMsg = 'SMTP authentication failed. Check MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD and MAIL_ENCRYPTION in .env.';
+            } elseif (str_contains(strtolower($msg), 'connection') || str_contains(strtolower($msg), 'refused') || str_contains(strtolower($msg), 'timeout')) {
+                $errorMsg = 'SMTP connection failed. Verify MAIL_HOST, MAIL_PORT, and network settings.';
+            } else {
+                $errorMsg = 'Failed to send test email: ' . $msg;
+            }
+
+            return back()->withErrors(['email' => $errorMsg]);
         }
     }
 
