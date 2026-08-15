@@ -11,16 +11,32 @@ class NewsletterSetting extends Model
 
     public static function getValue(string $key, mixed $default = null): mixed
     {
-        return Cache::remember("newsletter_setting.{$key}", 300, function () use ($key, $default) {
-            $record = static::where('key', $key)->first();
-            return $record ? $record->value : $default;
-        });
+        if (!\Illuminate\Support\Facades\Schema::hasTable('newsletter_settings')) {
+            return $default;
+        }
+
+        try {
+            return Cache::remember("newsletter_setting.{$key}", 300, function () use ($key, $default) {
+                $record = static::where('key', $key)->first();
+                return $record ? $record->value : $default;
+            });
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 
     public static function setValue(string $key, mixed $value): void
     {
-        static::updateOrCreate(['key' => $key], ['value' => (string) $value]);
-        Cache::forget("newsletter_setting.{$key}");
+        if (!\Illuminate\Support\Facades\Schema::hasTable('newsletter_settings')) {
+            return;
+        }
+
+        try {
+            static::updateOrCreate(['key' => $key], ['value' => (string) $value]);
+            Cache::forget("newsletter_setting.{$key}");
+        } catch (\Throwable $e) {
+            // Ignore if table not created yet
+        }
     }
 
     public static function getAllSettings(): array
@@ -39,8 +55,15 @@ class NewsletterSetting extends Model
             'default_email_footer' => 'Millennium Newsroom • Business, Markets and Policy Journalism',
         ];
 
-        $records = static::all()->pluck('value', 'key')->toArray();
+        if (!\Illuminate\Support\Facades\Schema::hasTable('newsletter_settings')) {
+            return $defaults;
+        }
 
-        return array_merge($defaults, $records);
+        try {
+            $records = static::all()->pluck('value', 'key')->toArray();
+            return array_merge($defaults, $records);
+        } catch (\Throwable $e) {
+            return $defaults;
+        }
     }
 }

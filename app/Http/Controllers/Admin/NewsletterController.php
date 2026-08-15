@@ -12,34 +12,40 @@ use App\Models\NewsletterEmailLog;
 use App\Models\NewsletterSetting;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class NewsletterController extends Controller
 {
     public function dashboard()
     {
-        $totalSubscribers = NewsletterSubscriber::count();
-        $activeSubscribers = NewsletterSubscriber::where('status', 'active')->count();
-        $unsubscribedSubscribers = NewsletterSubscriber::where('status', 'unsubscribed')->count();
-        $bouncedSubscribers = NewsletterSubscriber::where('status', 'bounced')->count();
+        $hasSubscribersTable = Schema::hasTable('newsletter_subscribers');
+        $hasLogsTable = Schema::hasTable('newsletter_email_logs');
+        $hasCampaignsTable = Schema::hasTable('newsletter_campaigns');
 
-        $sentToday = NewsletterEmailLog::where('status', 'sent')
-            ->whereDate('sent_at', now())
-            ->count();
+        $totalSubscribers = $hasSubscribersTable ? NewsletterSubscriber::count() : 0;
+        $activeSubscribers = $hasSubscribersTable ? NewsletterSubscriber::where('status', 'active')->count() : 0;
+        $unsubscribedSubscribers = $hasSubscribersTable ? NewsletterSubscriber::where('status', 'unsubscribed')->count() : 0;
+        $bouncedSubscribers = $hasSubscribersTable ? NewsletterSubscriber::where('status', 'bounced')->count() : 0;
 
-        $sentThisWeek = NewsletterEmailLog::where('status', 'sent')
-            ->whereBetween('sent_at', [now()->startOfWeek(), now()->endOfWeek()])
-            ->count();
+        $sentToday = $hasLogsTable ? NewsletterEmailLog::where('status', 'sent')->whereDate('sent_at', now())->count() : 0;
+        $sentThisWeek = $hasLogsTable ? NewsletterEmailLog::where('status', 'sent')->whereBetween('sent_at', [now()->startOfWeek(), now()->endOfWeek()])->count() : 0;
+        $failedCount = $hasLogsTable ? NewsletterEmailLog::where('status', 'failed')->count() : 0;
 
-        $failedCount = NewsletterEmailLog::where('status', 'failed')->count();
+        $lastCampaign = $hasCampaignsTable ? NewsletterCampaign::latest('created_at')->first() : null;
+        $recentCampaigns = $hasCampaignsTable ? NewsletterCampaign::latest()->take(5)->get() : collect();
 
-        $lastCampaign = NewsletterCampaign::latest('created_at')->first();
+        try {
+            $nextWeekly = now('Asia/Kolkata')->next(\Carbon\Carbon::MONDAY)->setTime(5, 0);
+        } catch (\Throwable $e) {
+            $nextWeekly = now('Asia/Kolkata')->addWeek()->startOfWeek()->setTime(5, 0);
+        }
 
-        // Calculate next Monday 5:00 AM IST
-        $nextWeekly = now('Asia/Kolkata')->next(\Carbon\Carbon::MONDAY)->setTime(5, 0);
-
-        $recentCampaigns = NewsletterCampaign::latest()->take(5)->get();
+        if (!$hasSubscribersTable || !$hasCampaignsTable) {
+            session()->flash('warning', 'Newsletter database tables are not migrated yet. Please run "php artisan migrate" on the server.');
+        }
 
         return view('admin.newsletter.dashboard', compact(
             'totalSubscribers',
@@ -57,6 +63,13 @@ class NewsletterController extends Controller
 
     public function subscribers(Request $request)
     {
+        if (!Schema::hasTable('newsletter_subscribers')) {
+            session()->flash('warning', 'Newsletter database tables are not migrated yet. Please run "php artisan migrate" on the server.');
+            $subscribers = new LengthAwarePaginator([], 0, 20);
+            $counts = ['all' => 0, 'active' => 0, 'unsubscribed' => 0, 'bounced' => 0, 'inactive' => 0];
+            return view('admin.newsletter.subscribers.index', compact('subscribers', 'counts'));
+        }
+
         $query = NewsletterSubscriber::query();
 
         if ($search = $request->query('search')) {
@@ -144,6 +157,13 @@ class NewsletterController extends Controller
 
     public function logs(Request $request)
     {
+        if (!Schema::hasTable('newsletter_email_logs')) {
+            session()->flash('warning', 'Newsletter database tables are not migrated yet. Please run "php artisan migrate" on the server.');
+            $logs = new LengthAwarePaginator([], 0, 25);
+            $stats = ['total' => 0, 'sent' => 0, 'failed' => 0, 'queued' => 0];
+            return view('admin.newsletter.logs', compact('logs', 'stats'));
+        }
+
         $query = NewsletterEmailLog::with(['subscriber', 'blog', 'campaign']);
 
         if ($search = $request->query('search')) {
