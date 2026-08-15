@@ -183,7 +183,12 @@ class NewsletterController extends Controller
     {
         $validated = $request->validate([
             'from_name' => 'required|string|max:255',
-            'from_email' => 'required|email|max:255',
+            'from_email' => ['required', 'email', function ($attribute, $value, $fail) {
+                $domain = strtolower(substr(strrchr($value, "@"), 1));
+                if ($domain !== 'millenniumnewsroom.com') {
+                    $fail('The From Email address must use the verified domain (@millenniumnewsroom.com).');
+                }
+            }],
             'reply_to' => 'required|email|max:255',
             'enable_new_post_notifications' => 'nullable|boolean',
             'enable_weekly_digest' => 'nullable|boolean',

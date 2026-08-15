@@ -31,9 +31,9 @@ class NewsletterSetting extends Model
             'weekly_send_day' => '1', // 1 = Monday
             'weekly_send_time' => '05:00',
             'timezone' => 'Asia/Kolkata',
-            'from_name' => 'MILLENNIUM NEWSROOM',
-            'from_email' => 'newsletter@millenniumnewsroom.com',
-            'reply_to' => 'editor@millenniumnewsroom.com',
+            'from_name' => 'Millennium Newsroom',
+            'from_email' => 'info@millenniumnewsroom.com',
+            'reply_to' => 'info@millenniumnewsroom.com',
             'batch_size' => '100',
             'batch_delay_seconds' => '0',
             'default_email_footer' => 'Millennium Newsroom • Business, Markets and Policy Journalism',

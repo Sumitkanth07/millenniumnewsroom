@@ -19,12 +19,14 @@ class TestNewsletterMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $fromName = config('mail.from.name', 'MILLENNIUM NEWSROOM');
-        $fromAddress = config('mail.from.address', 'newsletter@millenniumnewsroom.com');
+        $fromName = \App\Models\NewsletterSetting::getValue('from_name', config('mail.from.name', 'Millennium Newsroom'));
+        $fromAddress = \App\Models\NewsletterSetting::getValue('from_email', config('mail.from.address', 'info@millenniumnewsroom.com'));
+        $replyTo = \App\Models\NewsletterSetting::getValue('reply_to', 'info@millenniumnewsroom.com');
 
         return new Envelope(
             from: new Address($fromAddress, $fromName),
-            subject: 'Test Broadcast: Newsletter System Verification | MILLENNIUM NEWSROOM',
+            replyTo: [new Address($replyTo, $fromName)],
+            subject: 'Test Broadcast: Newsletter System Verification | Millennium Newsroom',
         );
     }
 
