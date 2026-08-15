@@ -102,10 +102,31 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/seo/update-robots', [\App\Http\Controllers\Admin\SeoManagerController::class, 'updateRobots'])->name('seo.update-robots');
         Route::post('/seo/clear-cache', [\App\Http\Controllers\Admin\SeoManagerController::class, 'clearCache'])->name('seo.clear-cache');
 
+        // Newsletter Admin Management
+        Route::get('/newsletter', [\App\Http\Controllers\Admin\NewsletterController::class, 'dashboard'])->name('newsletter.dashboard');
+        Route::get('/newsletter/subscribers', [\App\Http\Controllers\Admin\NewsletterController::class, 'subscribers'])->name('newsletter.subscribers.index');
+        Route::post('/newsletter/subscribers', [\App\Http\Controllers\Admin\NewsletterController::class, 'storeSubscriber'])->name('newsletter.subscribers.store');
+        Route::put('/newsletter/subscribers/{subscriber}', [\App\Http\Controllers\Admin\NewsletterController::class, 'updateSubscriber'])->name('newsletter.subscribers.update');
+        Route::delete('/newsletter/subscribers/{subscriber}', [\App\Http\Controllers\Admin\NewsletterController::class, 'destroySubscriber'])->name('newsletter.subscribers.destroy');
+        Route::patch('/newsletter/subscribers/{subscriber}/toggle', [\App\Http\Controllers\Admin\NewsletterController::class, 'toggleSubscriberStatus'])->name('newsletter.subscribers.toggle');
+        Route::get('/newsletter/logs', [\App\Http\Controllers\Admin\NewsletterController::class, 'logs'])->name('newsletter.logs');
+        Route::get('/newsletter/settings', [\App\Http\Controllers\Admin\NewsletterController::class, 'settings'])->name('newsletter.settings');
+        Route::post('/newsletter/settings', [\App\Http\Controllers\Admin\NewsletterController::class, 'updateSettings'])->name('newsletter.save-settings');
+        Route::post('/newsletter/send-test', [\App\Http\Controllers\Admin\NewsletterController::class, 'sendTest'])->name('newsletter.send-test');
+        Route::get('/newsletter/weekly/preview', [\App\Http\Controllers\Admin\NewsletterController::class, 'previewWeekly'])->name('newsletter.weekly.preview');
+        Route::post('/newsletter/weekly/trigger', [\App\Http\Controllers\Admin\NewsletterController::class, 'triggerWeeklyNow'])->name('newsletter.weekly.trigger');
+
         Route::resource('redirects', AdminRedirectController::class)->except(['show']);
         Route::post('/upload-image', [ImageUploadController::class, 'store'])->name('upload.image');
         Route::post('/uploads/images', [ImageUploadController::class, 'store'])->name('images.store');
     });
 });
+
+// Newsletter Public Routes
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterSubscriptionController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\NewsletterSubscriptionController::class, 'unsubscribeToken'])->name('newsletter.unsubscribe');
+Route::post('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\NewsletterSubscriptionController::class, 'unsubscribePost'])->name('newsletter.unsubscribe.post');
+Route::get('/newsletter/preferences/{token}', [\App\Http\Controllers\NewsletterSubscriptionController::class, 'preferences'])->name('newsletter.preferences');
+Route::post('/newsletter/preferences/{token}', [\App\Http\Controllers\NewsletterSubscriptionController::class, 'updatePreferences'])->name('newsletter.preferences.update');
 
 Route::get('/{category:slug}/{blog:slug}', [BlogController::class, 'show'])->name('blog.category.show');

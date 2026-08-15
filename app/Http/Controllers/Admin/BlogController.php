@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendNewPostNotificationJob;
 use App\Models\Author;
 use App\Models\Blog;
 use App\Models\Category;
@@ -67,6 +68,10 @@ class BlogController extends Controller
         $this->syncTags($blog, $request->input('tags'));
         $this->clearPublishingCaches();
 
+        if ($blog->is_published) {
+            SendNewPostNotificationJob::dispatch($blog);
+        }
+
         return redirect()->route('admin.blogs.index')->with('status', 'Post created.');
     }
 
@@ -77,6 +82,7 @@ class BlogController extends Controller
 
     public function update(Request $request, Blog $blog)
     {
+        $wasPublished = (bool) $blog->is_published;
         $data = $this->validated($request);
         $data['category_id'] = $this->resolveCategory($request, $data['category_id'] ?? null);
         $data['slug'] = Blog::uniqueSlug($data['slug'] ?: $data['title'], $blog->id);
@@ -93,6 +99,10 @@ class BlogController extends Controller
         $blog->update($data);
         $this->syncTags($blog, $request->input('tags'));
         $this->clearPublishingCaches();
+
+        if (!$wasPublished && $blog->is_published) {
+            SendNewPostNotificationJob::dispatch($blog);
+        }
 
         return redirect()->route('admin.blogs.index')->with('status', 'Post updated.');
     }

@@ -28,9 +28,15 @@
         </div>
 
         <div class="footer-newsletter__panel">
-            <form class="footer-newsletter__form" action="#">
+            @if(session('newsletter_status'))
+                <div style="background-color: #e6f4ea; color: #137333; padding: 10px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 10px;">
+                    {{ session('newsletter_status') }}
+                </div>
+            @endif
+            <form class="footer-newsletter__form" method="POST" action="{{ route('newsletter.subscribe') }}">
+                @csrf
                 <label class="sr-only" for="footer-email">Email address</label>
-                <input id="footer-email" type="email" placeholder="Email address">
+                <input id="footer-email" name="email" type="email" placeholder="Email address" required>
                 <button type="submit">Subscribe</button>
             </form>
 

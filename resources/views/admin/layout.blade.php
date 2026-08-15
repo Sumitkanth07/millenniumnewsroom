@@ -26,6 +26,13 @@
             <a href="{{ route('admin.advertisements.settings') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Settings</a>
             <a href="{{ route('admin.advertisements.reports') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Reports</a>
         </div>
+        <div style="display: flex; flex-direction: column; padding: 5px 0;">
+            <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); padding: 5px 15px 5px 15px; font-weight: bold;">Newsletter</span>
+            <a href="{{ route('admin.newsletter.dashboard') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Newsletter Dashboard</a>
+            <a href="{{ route('admin.newsletter.subscribers.index') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Subscribers</a>
+            <a href="{{ route('admin.newsletter.logs') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Email Logs</a>
+            <a href="{{ route('admin.newsletter.settings') }}" style="padding-left: 25px; font-size: 13px; opacity: 0.9;">Settings & Deliverability</a>
+        </div>
         <a href="{{ route('admin.branding.edit') }}">Branding</a>
         <a href="{{ route('admin.navigation.index') }}">Navigation</a>
         <a href="{{ route('admin.footer.edit') }}">Footer Settings</a>
