@@ -11,7 +11,7 @@ class BlogController extends Controller
     {
         return view('blog.index', [
 
-            'blogs' => Blog::with(['category', 'author'])
+            'blogs' => Blog::with(['category', 'author']) 
                 ->published()
                 ->latest('published_at')
                 ->paginate(9),
