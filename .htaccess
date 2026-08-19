@@ -31,6 +31,16 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Serve Favicon Assets Directly
+    RewriteRule ^favicon\.ico$ public/favicon.ico [L]
+    RewriteRule ^favicon-48x48\.png$ public/favicon-48x48.png [L]
+    RewriteRule ^favicon-32x32\.png$ public/favicon-32x32.png [L]
+    RewriteRule ^favicon-16x16\.png$ public/favicon-16x16.png [L]
+    RewriteRule ^apple-touch-icon\.png$ public/apple-touch-icon.png [L]
+    RewriteRule ^android-chrome-192x192\.png$ public/android-chrome-192x192.png [L]
+    RewriteRule ^android-chrome-512x512\.png$ public/android-chrome-512x512.png [L]
+    RewriteRule ^site\.webmanifest$ public/site.webmanifest [L]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
