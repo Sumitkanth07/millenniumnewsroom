@@ -44,6 +44,70 @@ Route::get('/ads.txt', function () {
     return response(file_get_contents($path), 200, ['Content-Type' => 'text/plain']);
 });
 
+Route::get('/favicon.ico', function () {
+    $path = public_path('favicon.ico');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/x-icon']);
+});
+
+Route::get('/favicon-48x48.png', function () {
+    $path = public_path('favicon-48x48.png');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/png']);
+});
+
+Route::get('/favicon-32x32.png', function () {
+    $path = public_path('favicon-32x32.png');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/png']);
+});
+
+Route::get('/favicon-16x16.png', function () {
+    $path = public_path('favicon-16x16.png');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/png']);
+});
+
+Route::get('/apple-touch-icon.png', function () {
+    $path = public_path('apple-touch-icon.png');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/png']);
+});
+
+Route::get('/android-chrome-192x192.png', function () {
+    $path = public_path('android-chrome-192x192.png');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/png']);
+});
+
+Route::get('/android-chrome-512x512.png', function () {
+    $path = public_path('android-chrome-512x512.png');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'image/png']);
+});
+
+Route::get('/site.webmanifest', function () {
+    $path = public_path('site.webmanifest');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, ['Content-Type' => 'application/manifest+json']);
+});
+
 Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/category/{category:slug}', [FrontendController::class, 'category'])->name('category.show');

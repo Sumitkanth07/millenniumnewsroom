@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url('/favicon.ico') }}">
     <title>Admin | {{ $siteName ?? 'MILLENNIUM NEWSROOM' }}</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ $assetVersion }}">
     <link rel="stylesheet" href="{{ asset('css/news.css') }}?v={{ $assetVersion }}">
