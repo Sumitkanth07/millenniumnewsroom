@@ -8,7 +8,7 @@ use App\Models\Category;
 class BlogController extends Controller
 {
     public function index()
-    {
+    {  
         return view('blog.index', [
 
             'blogs' => Blog::with(['category', 'author']) 
