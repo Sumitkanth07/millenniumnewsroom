@@ -151,14 +151,14 @@
 
         <x-ad-slot placement="single_post_top" label="Single Post Top Ad" />
 
+        @php
+            $embedData = \App\Services\MediaEmbedSanitizer::process($blog->content);
+            $blocks = $embedData['blocks'];
+        @endphp
+
         <div id="story" class="content">
-            @php
-                $paragraphs = explode('</p>', $blog->content);
-            @endphp
-            @foreach($paragraphs as $index => $paragraph)
-                @if(trim($paragraph) !== '')
-                    {!! $paragraph !!}</p>
-                @endif
+            @foreach($blocks as $index => $block)
+                {!! $block !!}
                 
                 @if($index === 2)
                     <x-ad-slot placement="after_3rd_paragraph" label="After 3rd Paragraph Ad" />
@@ -171,6 +171,16 @@
                 @endif
             @endforeach
         </div>
+
+        @if($embedData['has_twitter'])
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        @endif
+        @if($embedData['has_instagram'])
+            <script async src="https://www.instagram.com/embed.js"></script>
+        @endif
+        @if($embedData['has_facebook'])
+            <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0"></script>
+        @endif
 
         @if($blog->gallery_images)
 

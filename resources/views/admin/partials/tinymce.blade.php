@@ -35,9 +35,34 @@ window.addEventListener('load', () => {
             'bold italic underline strikethrough | ' +
             'alignleft aligncenter alignright alignjustify | ' +
             'bullist numlist outdent indent | ' +
-            'link image media table | ' +
+            'link image media embedmedia table | ' +
             'codesample blockquote | ' +
             'preview fullscreen code',
+
+        extended_valid_elements: 'iframe[src|title|width|height|allow|allowfullscreen|frameborder|class|loading|style],blockquote[class|style|dir|data-*],div[class|style|id|data-*],span[class|style],a[href|target|rel|title|class],img[src|alt|title|width|height|class|loading|style]',
+        valid_children: '+body[iframe|blockquote|style|script]',
+        media_live_embeds: true,
+
+        setup: (editor) => {
+            editor.ui.registry.addButton('embedmedia', {
+                text: 'Embed Media',
+                icon: 'embed',
+                tooltip: 'Insert YouTube, X/Twitter, Instagram or iframe embed',
+                onAction: () => {
+                    const input = prompt('Paste YouTube URL, Tweet/X URL, Instagram URL, or <iframe> embed code:');
+                    if (!input || !input.trim()) return;
+                    const val = input.trim();
+                    
+                    const ytMatch = val.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_\-]+)/i);
+                    if (ytMatch) {
+                        editor.insertContent(`<div class="media-embed-responsive youtube-embed"><iframe src="https://www.youtube-nocookie.com/embed/${ytMatch[1]}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>`);
+                        return;
+                    }
+                    
+                    editor.insertContent(val);
+                }
+            });
+        },
 
         toolbar_sticky: true,
 
