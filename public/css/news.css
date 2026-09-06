@@ -446,3 +446,30 @@ html[data-theme="dark"] .fresh-feed-card p {
         gap: 16px !important;
     }
 }
+
+/* Category Card Title Link Clean Text Reset */
+.category-showcase-card a,
+.category-card-panel a {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .category-showcase-card a,
+html[data-theme="dark"] .category-card-panel a {
+    background: transparent !important;
+    color: inherit !important;
+}
+
+.category-showcase-card h4 a {
+    color: inherit !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+    display: inline !important;
+}
+
+.category-showcase-card h4 a:hover {
+    color: #c79a2b !important;
+}

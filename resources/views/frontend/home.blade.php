@@ -231,7 +231,7 @@
             
             <div class="category-showcase-grid cols-{{ min($categories->count(), 6) }}">
                 @foreach($categories as $category)
-                    <div class="category-card-panel" style="background: rgba(255,255,255,0.6); padding: 24px; border-radius: 12px; border: 1px solid rgba(199,154,43,0.15); display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                    <div class="category-showcase-card" style="background: rgba(255,255,255,0.6); padding: 24px; border-radius: 12px; border: 1px solid rgba(199,154,43,0.15); display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #c79a2b; padding-bottom: 12px; margin-bottom: 20px;">
                                 <h3 style="font-family: Georgia, serif; font-size: 22px; margin: 0;">{{ $category->name }}</h3>
