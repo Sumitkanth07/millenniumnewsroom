@@ -97,7 +97,7 @@ class FrontendController extends Controller
                 ->where('is_active', true)
                 ->whereHas('blogs', fn ($query) => $query->published())
                 ->orderBy('sort_order')
-                ->take(5)
+                ->take(6)
                 ->get();
 
             return [

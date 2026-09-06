@@ -60,7 +60,7 @@
         <x-ad-slot :ads="$ads" placement="header_ad" label="Header responsive ad" />
 
         <!-- Breaking News / Top Stories & Fresh News -->
-        <section class="spotlight-grid reveal" style="align-items: stretch;">
+        <section class="spotlight-grid reveal" style="align-items: start;">
             <div class="top-headlines-panel" style="display: flex; flex-direction: column;">
                 <div class="section-head" style="margin-bottom: 24px;">
                     <div>
@@ -70,8 +70,8 @@
                     <a href="{{ route('search') }}" style="color: #c79a2b; font-weight: bold;">View all</a>
                 </div>
                 
-                <div class="headline-mosaic" style="flex: 1;">
-                    @foreach($latestBlogs->take(6) as $post)
+                <div class="headline-mosaic">
+                    @foreach($latestBlogs->take(5) as $post)
                         @php
                             $topImage = $post->featured_image ?: $post->image;
                             if ($topImage && !str_starts_with($topImage, 'http') && !str_starts_with($topImage, '/')) {
@@ -85,6 +85,73 @@
                             <div style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
                                 <span style="background: #c79a2b; color: #1f1a12; padding: 3px 8px; border-radius: 4px; font-size: 10px;">{{ $post->category?->name }}</span>
                                 <h3 style="margin-top: 10px;"><a href="{{ $post->publicUrl() }}">{{ $post->title }}</a></h3>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+
+                @php
+                    $usedMosaicIds = $latestBlogs->take(5)->pluck('id')->toArray();
+                    $remainingBlogs = $latestBlogs->reject(fn($p) => in_array($p->id, $usedMosaicIds))->values();
+
+                    $freshFeedCardsConfig = [
+                        [
+                            'category' => 'BUSINESS',
+                            'default_title' => "India's Economy Shows Strong Growth as Key Sectors Gain Momentum",
+                            'default_excerpt' => "India's business and economic landscape continues to evolve as major sectors record fresh growth and investment opportunities.",
+                            'post' => $remainingBlogs->firstWhere(fn($p) => strtolower($p->category?->name ?? '') === 'business') ?? $remainingBlogs->get(0),
+                        ],
+                        [
+                            'category' => 'TECHNOLOGY',
+                            'default_title' => "AI Is Changing How Businesses Work in the Digital Era",
+                            'default_excerpt' => "From automation to smarter decision-making, artificial intelligence is reshaping modern businesses and digital services.",
+                            'post' => $remainingBlogs->firstWhere(fn($p) => strtolower($p->category?->name ?? '') === 'technology') ?? $remainingBlogs->get(1),
+                        ],
+                        [
+                            'category' => 'SPORTS',
+                            'default_title' => "Major Sports Events Keep Fans Watching Across India",
+                            'default_excerpt' => "From cricket to emerging sporting competitions, athletes and teams continue to create new moments for fans.",
+                            'post' => $remainingBlogs->firstWhere(fn($p) => strtolower($p->category?->name ?? '') === 'sports') ?? $remainingBlogs->get(2),
+                        ],
+                        [
+                            'category' => 'EDUCATION',
+                            'default_title' => "New Education Trends Are Shaping Student Career Choices",
+                            'default_excerpt' => "Students are exploring new courses, skills and career paths as education continues to adapt to changing industry needs.",
+                            'post' => $remainingBlogs->firstWhere(fn($p) => strtolower($p->category?->name ?? '') === 'education') ?? $remainingBlogs->get(3),
+                        ],
+                    ];
+
+                    $usedCardIds = [];
+                @endphp
+
+                <div class="fresh-feed-cards-grid">
+                    @foreach($freshFeedCardsConfig as $item)
+                        @php
+                            $p = $item['post'];
+                            $isUnique = $p && !in_array($p->id, $usedMosaicIds) && !in_array($p->id, $usedCardIds);
+                            if ($isUnique) {
+                                $usedCardIds[] = $p->id;
+                                $catName = strtoupper($p->category?->name ?: $item['category']);
+                                $cardTitle = $p->title;
+                                $cardExcerpt = \Illuminate\Support\Str::limit($p->excerpt, 110);
+                                $cardUrl = $p->publicUrl();
+                                $cardDate = optional($p->published_at)->format('M d, Y');
+                            } else {
+                                $catName = $item['category'];
+                                $cardTitle = $item['default_title'];
+                                $cardExcerpt = $item['default_excerpt'];
+                                $cardUrl = route('search') . '?q=' . strtolower($item['category']);
+                                $cardDate = now()->format('M d, Y');
+                            }
+                        @endphp
+                        <article class="fresh-feed-card">
+                            <div>
+                                <span class="card-cat">{{ $catName }}</span>
+                                <h3><a href="{{ $cardUrl }}">{{ $cardTitle }}</a></h3>
+                                <p>{{ $cardExcerpt }}</p>
+                            </div>
+                            <div class="card-meta">
+                                {{ $cardDate }}
                             </div>
                         </article>
                     @endforeach
@@ -162,42 +229,44 @@
                 </div>
             </div>
             
-            <div class="responsive-grid-auto">
+            <div class="category-showcase-grid cols-{{ min($categories->count(), 6) }}">
                 @foreach($categories as $category)
-                    <div style="background: rgba(255,255,255,0.6); padding: 24px; border-radius: 12px; border: 1px solid rgba(199,154,43,0.15);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #c79a2b; padding-bottom: 12px; margin-bottom: 20px;">
-                            <h3 style="font-family: Georgia, serif; font-size: 22px; margin: 0;">{{ $category->name }}</h3>
-                            <a href="{{ route('category.show', $category->slug) }}" style="font-size: 12px; font-weight: bold; color: #c79a2b; text-transform: uppercase;">See All</a>
-                        </div>
-                        
-                        @php
-                            $catPosts = $category->blogs;
-                            if ($catPosts->count() < 4) {
-                                $usedIds = $catPosts->pluck('id')->toArray();
-                                $catPosts = $catPosts->concat(\App\Models\Blog::fetchWithFallback(4 - $catPosts->count(), $usedIds, $category->id));
-                            }
-                        @endphp
-                        
-                        <div style="display: flex; flex-direction: column; gap: 20px;">
-                            @foreach($catPosts as $post)
-                                @php
-                                    $img = $post->featured_image ?: $post->image;
-                                    if ($img && !str_starts_with($img, 'http') && !str_starts_with($img, '/')) {
-                                        $img = ltrim($img, '/');
-                                    }
-                                @endphp
-                                <div style="display: flex; gap: 16px; align-items: flex-start;">
-                                    @if($img)
-                                        <a href="{{ $post->publicUrl() }}" style="flex: 0 0 90px;">
-                                            <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" width="90" height="70" style="width: 90px; height: 70px; object-fit: cover; border-radius: 8px;" loading="lazy" decoding="async">
-                                        </a>
-                                    @endif
-                                    <div>
-                                        <h4 style="margin: 0 0 6px 0; font-size: 16px; font-family: Georgia, serif; line-height: 1.3;"><a href="{{ $post->publicUrl() }}">{{ $post->title }}</a></h4>
-                                        <small style="color: #8e7d61; font-size: 12px; font-weight: 600;">{{ optional($post->published_at)->format('M d') }}</small>
+                    <div class="category-card-panel" style="background: rgba(255,255,255,0.6); padding: 24px; border-radius: 12px; border: 1px solid rgba(199,154,43,0.15); display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #c79a2b; padding-bottom: 12px; margin-bottom: 20px;">
+                                <h3 style="font-family: Georgia, serif; font-size: 22px; margin: 0;">{{ $category->name }}</h3>
+                                <a href="{{ route('category.show', $category->slug) }}" style="font-size: 12px; font-weight: bold; color: #c79a2b; text-transform: uppercase;">See All</a>
+                            </div>
+                            
+                            @php
+                                $catPosts = $category->blogs;
+                                if ($catPosts->count() < 4) {
+                                    $usedIds = $catPosts->pluck('id')->toArray();
+                                    $catPosts = $catPosts->concat(\App\Models\Blog::fetchWithFallback(4 - $catPosts->count(), $usedIds, $category->id));
+                                }
+                            @endphp
+                            
+                            <div style="display: flex; flex-direction: column; gap: 20px;">
+                                @foreach($catPosts as $post)
+                                    @php
+                                        $img = $post->featured_image ?: $post->image;
+                                        if ($img && !str_starts_with($img, 'http') && !str_starts_with($img, '/')) {
+                                            $img = ltrim($img, '/');
+                                        }
+                                    @endphp
+                                    <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                        @if($img)
+                                            <a href="{{ $post->publicUrl() }}" style="flex: 0 0 90px;">
+                                                <img src="{{ $post->getThumbnailUrl() }}" alt="{{ $post->title }}" width="90" height="70" style="width: 90px; height: 70px; object-fit: cover; border-radius: 8px;" loading="lazy" decoding="async">
+                                            </a>
+                                        @endif
+                                        <div>
+                                            <h4 style="margin: 0 0 6px 0; font-size: 16px; font-family: Georgia, serif; line-height: 1.3;"><a href="{{ $post->publicUrl() }}">{{ $post->title }}</a></h4>
+                                            <small style="color: #8e7d61; font-size: 12px; font-weight: 600;">{{ optional($post->published_at)->format('M d') }}</small>
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endforeach
